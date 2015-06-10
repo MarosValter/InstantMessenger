@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InstantMessenger.DataModel"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InstantMessenger.Core", "InstantMessenger.Core\InstantMessenger.Core.csproj", "{250E222A-EFFD-4F1E-A57A-E3BDF5278C17}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{DA2FF556-7667-44BC-83F2-5D33A522F736}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InstantMessenger.Tests", "Tests\InstantMessenger.Tests.csproj", "{DA2FF556-7667-44BC-83F2-5D33A522F736}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{4C02BCC1-4209-41F7-BBD7-1726EAF5C39D}"
 	ProjectSection(SolutionItems) = preProject

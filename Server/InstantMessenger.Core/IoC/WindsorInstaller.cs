@@ -72,7 +72,7 @@ namespace InstantMessenger.Core.IoC
         private static ISessionFactory CreateSessionFactory()
         {
             return Fluently.Configure()
-                //.Database(MsSqlConfiguration.MsSql2012.ConnectionString(c => c.FromConnectionStringWithKey("Default")).ShowSql)
+                .Database(MsSqlConfiguration.MsSql2012.ConnectionString(c => c.FromConnectionStringWithKey("Default")).ShowSql)
                 .Mappings(m => m.FluentMappings.AddFromAssembly(DataModelAssembly))
                 .BuildSessionFactory();
         }

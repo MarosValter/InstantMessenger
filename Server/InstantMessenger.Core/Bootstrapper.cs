@@ -11,7 +11,7 @@ namespace InstantMessenger.Core
         {
             ObjectFactory.Init();
             // Build ISessionFactory
-            //ObjectFactory.GetInstance<IUnitOfWork>();
+            ObjectFactory.GetInstance<IUnitOfWork>();
 
             var config = ObjectFactory.GetInstance<IConfiguration>();
             var dataManagers = ObjectFactory.GetAllInstances<IDataManager>();

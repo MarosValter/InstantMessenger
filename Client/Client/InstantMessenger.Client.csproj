@@ -221,6 +221,10 @@
     <Resource Include="Resources\direct-message.jpg" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Server\InstantMessenger.Common\InstantMessenger.Common.csproj">
+      <Project>{b2113b06-b6fa-4a5c-9306-e347ca1214d0}</Project>
+      <Name>InstantMessenger.Common</Name>
+    </ProjectReference>
     <ProjectReference Include="..\InstantMessenger.Client.Base\InstantMessenger.Client.Base.csproj">
       <Project>{6ebd9df9-2563-4843-8781-ceb2f37efda3}</Project>
       <Name>InstantMessenger.Client.Base</Name>

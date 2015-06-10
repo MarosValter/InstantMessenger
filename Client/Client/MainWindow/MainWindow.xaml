@@ -1,0 +1,43 @@
+﻿<base:WindowBase
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:p="clr-namespace:InstantMessenger.Client.Properties"
+        xmlns:base="clr-namespace:InstantMessenger.Client.Base;assembly=InstantMessenger.Client.Base"
+        x:Class="InstantMessenger.Client.MainWindow.MainWindow"
+        Title="MainWindow" Height="400" Width="550">
+    <Grid Margin="5" ScrollViewer.CanContentScroll="True">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="86"/>
+            <RowDefinition Height="215*"/>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="30"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" MinWidth="125" MaxWidth="125"/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <StackPanel Margin="0,2,1,2" Grid.Row="1" CanVerticallyScroll="True" ScrollViewer.VerticalScrollBarVisibility="Auto">
+            <Expander Header="Online" IsExpanded="True" Foreground="#FF707070">
+                <ListBox x:Name="OnlineFriends" ItemsSource="{Binding Path=OnlineFriends}" DisplayMemberPath="Username" MouseDoubleClick="OnlineFriends_MouseDoubleClick" BorderBrush="{x:Null}" Background="{x:Null}"/>
+            </Expander>
+            <Separator Foreground="#FFACACAC" Background="#FFACACAC"/>
+            <Expander Header="Offline" Foreground="#FF707070">
+                <ListBox x:Name="OfflineFriends" ItemsSource="{Binding Path=OfflineFriends}" DisplayMemberPath="Username" BorderBrush="{x:Null}" Background="{x:Null}"/>
+            </Expander>
+        </StackPanel>
+        <TabControl x:Name="Conversations" Margin="1,0,0,2" Grid.Column="1" Grid.Row="1" Grid.RowSpan="3" Padding="0"/>
+        <Button x:Name="FindUsers" Content="Find users.." Background="White" Margin="0,2,1,2" Grid.Row="3" Grid.Column="0" Click="_btnFriends_Click" Foreground="#FF707070" BorderBrush="#FFACACAC"/>
+        <Button x:Name="Requests" Margin="0,2,1,2" Grid.Row="2" Grid.Column="0" Background="White" Click="_btnRequests_Click" Foreground="#FF707070" BorderBrush="#FFACACAC">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="60*"/>
+                    <ColumnDefinition Width="5"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="{x:Static p:Resources.Requests}" Grid.Column="0"/>
+                <TextBlock Text="{Binding Path=RequestCountGui}" Grid.Column="2" Foreground="#FFFF3535"/>
+            </Grid>
+        </Button>
+        <Border BorderBrush="#FFACACAC" BorderThickness="1" Margin="0,2,1,1" Grid.Row="1"/>
+    </Grid>
+</base:WindowBase>

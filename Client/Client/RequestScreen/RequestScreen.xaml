@@ -1,0 +1,40 @@
+﻿<base:WindowBase
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:p="clr-namespace:InstantMessenger.Client.Properties"
+        xmlns:base="clr-namespace:InstantMessenger.Client.Base;assembly=InstantMessenger.Client.Base"
+        x:Class="InstantMessenger.Client.RequestScreen.RequestScreen"
+        Title="Friend requests" Height="300" Width="400" ResizeMode="NoResize">
+    <Grid>
+        <DataGrid x:Name="_grid" ItemsSource="{Binding Path=Requests}" SelectedValue="{Binding Path=SelectedUserOid}" Margin="5,5,5,40" TabIndex="2" IsTextSearchEnabled="True" Background="White" AutoGenerateColumns="False" SelectedValuePath="UserOID" CanUserReorderColumns="False" SelectionMode="Single" CanUserAddRows="False" ScrollViewer.CanContentScroll="False" HorizontalGridLinesBrush="Gray" VerticalGridLinesBrush="Gray" GridLinesVisibility="Horizontal" CanUserResizeColumns="False" CanUserResizeRows="False" MinRowHeight="22">
+            <!--<DataGrid.RowDetailsTemplate>
+                <DataTemplate>
+                    <DockPanel>
+                        <Button DockPanel.Dock="Left" Click="_btnAccept_OnClick" Name="_btnAccept" Background="White" Height="25" Width="80" FontSize="14" FontWeight="Bold">Accept</Button>
+                        <Button DockPanel.Dock="Right"  Click="_btnDelete_OnClick" Name="_btnDelete" Background="White" Height="25" Width="80" FontSize="14" FontWeight="Bold">Delete</Button>
+                    </DockPanel>
+                </DataTemplate>
+            </DataGrid.RowDetailsTemplate>-->
+            <DataGrid.Columns>
+                <DataGridTextColumn CanUserResize="False" Width="*" Header="Username" Binding="{Binding Username}" IsReadOnly="True" Foreground="#FF474747" FontWeight="SemiBold" FontSize="13"/>
+                <DataGridTextColumn Width="130" Header="Date" Binding="{Binding Created}" />
+                <DataGridTemplateColumn CanUserResize="False" Width="64">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type base:WindowBase}}, Path=OKCommand}" Content="{x:Static p:Resources.Accept}" Name="_btnAccept" Background="White" Height="20" Width="60" FontSize="12" FontWeight="Medium"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn CanUserResize="False" Width="64">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type base:WindowBase}}, Path=RequestCommand}" Content="{x:Static p:Resources.Delete}" CommandParameter="{Binding Path=DeleteRequestAction}" Background="White" Height="20" Width="60" FontSize="12" FontWeight="Medium"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+        <Button x:Name="_btnClose" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type base:WindowBase}}, Path=CancelCommand}" Content="{x:Static p:Resources.Close}" Margin="0,0,5,5" Height="20" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="75" IsCancel="True" TabIndex="4" Background="White"/>
+
+    </Grid>
+</base:WindowBase>

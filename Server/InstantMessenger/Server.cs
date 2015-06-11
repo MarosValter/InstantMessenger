@@ -6,6 +6,7 @@ using System.Net.Sockets;
 using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
 using InstantMessenger.Core;
+using InstantMessenger.DataModel.BRO;
 using InstantMessenger.DataModel.DataManagers;
 
 namespace InstantMessenger.Server
@@ -157,7 +158,7 @@ namespace InstantMessenger.Server
 
             if (user.User != null)
             {
-                UsersDataManager.Logout(user.User.OID);
+                ObjectFactory.GetInstance<UsersDataManager>().Logout(user.User.OID);
             }
         }
 
@@ -172,6 +173,8 @@ namespace InstantMessenger.Server
             {
                 client.Dispose();
             }
+
+            ObjectFactory.GetInstance<BROUsers>().LogoutAllUsers();
         }
 
         #endregion

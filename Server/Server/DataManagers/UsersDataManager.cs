@@ -7,6 +7,7 @@ using InstantMessenger.Common.Flats;
 using InstantMessenger.Common.TransportObject;
 using InstantMessenger.Core;
 using InstantMessenger.Core.Base.Implementation;
+using InstantMessenger.Core.UOW;
 using InstantMessenger.DataModel.BDO;
 using InstantMessenger.DataModel.BRO;
 
@@ -21,7 +22,8 @@ namespace InstantMessenger.DataModel.DataManagers
                   .ConstructProjectionUsing(src => Mapper.Map<BDOUser, UserFlat>(src.Friend));
         }
 
-        public static TransportObject LoginUser(TransportObject to)
+        [UnitOfWork]
+        public TransportObject LoginUser(TransportObject to)
         {
             var username = to.Get<string>("Username");
             var pwdHash = to.Get<byte[]>("Password");
@@ -57,13 +59,16 @@ namespace InstantMessenger.DataModel.DataManagers
 
             ObjectFactory.GetInstance<BROUsers>().Update(user);
 
+            var flat = Mapper.Map<BDOUser, UserFlat>(user);
+
             dto.Type = Protocol.MessageType.IM_OK;
             dto.Add("MyOid", user.OID);
+            dto.Add("UserFlat", flat);
 
             return dto;
         }
 
-        public static void Logout(long oid)
+        public void Logout(long oid)
         {
             //var bro = ObjectFactory.GetInstance<BROUsers>();
             var user = ObjectFactory.GetInstance<BROUsers>().GetByOid(oid);
@@ -72,7 +77,7 @@ namespace InstantMessenger.DataModel.DataManagers
             ObjectFactory.GetInstance<BROUsers>().Update(user);
         }
 
-        public static TransportObject Register(TransportObject to)
+        public TransportObject Register(TransportObject to)
         {
             var username = to.Get<string>("Username");
             var pwd = to.Get<byte[]>("Password");
@@ -103,7 +108,8 @@ namespace InstantMessenger.DataModel.DataManagers
             return dto;
         }
 
-        public static TransportObject MainWindowInit(TransportObject to)
+        [UnitOfWork]
+        public TransportObject MainWindowInit(TransportObject to)
         {
             //var broFriendship = ObjectFactory.GetInstance<BROFriendship>();
             var myOid = to.Get<long>("MyOid");
@@ -126,7 +132,7 @@ namespace InstantMessenger.DataModel.DataManagers
             return dto;
         }
 
-        public static TransportObject FindUsers(TransportObject to)
+        public TransportObject FindUsers(TransportObject to)
         {
             var username = to.Get<string>("Username");
             var users = ObjectFactory.GetInstance<BROUsers>().GetUsersStartingNameWith(username);

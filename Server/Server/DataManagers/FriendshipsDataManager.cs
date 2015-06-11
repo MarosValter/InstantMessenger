@@ -18,7 +18,7 @@ namespace InstantMessenger.DataModel.DataManagers
             mapper.CreateMap<BDOFriendship, RequestFlat>();
         }
 
-        public static TransportObject GetRequests(TransportObject to)
+        public TransportObject GetRequests(TransportObject to)
         {
             var myOid = to.Get<long>("MyOid");
 
@@ -37,7 +37,7 @@ namespace InstantMessenger.DataModel.DataManagers
             return dto;
         }
 
-        public static TransportObject SendRequest(TransportObject to)
+        public TransportObject SendRequest(TransportObject to)
         {
             var senderOid = to.Get<long>("MyOid");
             var recipientOid = to.Get<long>("UserOid");
@@ -76,7 +76,7 @@ namespace InstantMessenger.DataModel.DataManagers
         }
 
         [UnitOfWork]
-        public static TransportObject AcceptRequest(TransportObject to)
+        public TransportObject AcceptRequest(TransportObject to)
         {
             var userOid = to.Get<long>("UserOid");
             var myOid = to.Get<long>("MyOid");
@@ -113,7 +113,7 @@ namespace InstantMessenger.DataModel.DataManagers
             return GetRequests(to);
         }
 
-        public static TransportObject DeleteRequest(TransportObject to)
+        public TransportObject DeleteRequest(TransportObject to)
         {
             throw new NotImplementedException();
         }

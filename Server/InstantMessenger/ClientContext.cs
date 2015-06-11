@@ -5,6 +5,7 @@ using System.Net.Sockets;
 using InstantMessenger.Common;
 using InstantMessenger.Common.Flats;
 using InstantMessenger.Common.TransportObject;
+using InstantMessenger.Core;
 using InstantMessenger.DataModel.DataManagers;
 
 namespace InstantMessenger.Server
@@ -84,7 +85,7 @@ namespace InstantMessenger.Server
             {
                 case Protocol.MessageType.IM_Login:
 
-                    result = UsersDataManager.LoginUser(to);
+                    result = ObjectFactory.GetInstance<UsersDataManager>().LoginUser(to);
                     if (result.Type == Protocol.MessageType.IM_OK)
                     {
                         User = result.Get<UserFlat>("UserFlat");
@@ -93,25 +94,25 @@ namespace InstantMessenger.Server
                     }
                     break;
                 case Protocol.MessageType.IM_FriendsRequests:
-                    result = UsersDataManager.MainWindowInit(to);
+                    result = ObjectFactory.GetInstance<UsersDataManager>().MainWindowInit(to);
                     break;
                 case Protocol.MessageType.IM_Register:
-                    result = UsersDataManager.Register(to);
+                    result = ObjectFactory.GetInstance<UsersDataManager>().Register(to);
                     break;
                 case Protocol.MessageType.IM_Find:
-                    result = UsersDataManager.FindUsers(to);
+                    result = ObjectFactory.GetInstance<UsersDataManager>().FindUsers(to);
                     break;
                 case Protocol.MessageType.IM_GetRequests:
-                    result = FriendshipsDataManager.GetRequests(to);
+                    result = ObjectFactory.GetInstance<FriendshipsDataManager>().GetRequests(to);
                     break;
                 case Protocol.MessageType.IM_Add:
-                    result = FriendshipsDataManager.SendRequest(to);
+                    result = ObjectFactory.GetInstance<FriendshipsDataManager>().SendRequest(to);
                     break;
                 case Protocol.MessageType.IM_Accept:
-                    result = FriendshipsDataManager.AcceptRequest(to);
+                    result = ObjectFactory.GetInstance<FriendshipsDataManager>().AcceptRequest(to);
                     break;
                 case Protocol.MessageType.IM_DeleteRequest:
-                    result = FriendshipsDataManager.DeleteRequest(to);
+                    result = ObjectFactory.GetInstance<FriendshipsDataManager>().DeleteRequest(to);
                     break;
             }
             

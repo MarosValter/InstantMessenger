@@ -8,6 +8,13 @@ namespace InstantMessenger.DataModel.BRO
 {
     public class BROUsers : BROGeneric<BDOUser>
     {
+        #region SQL queries
+
+        private const string QLogoutAllUsers = "UPDATE T01Users " +
+                                               "SET T01IsOnline = 'False'";
+
+        #endregion
+
         public BROUsers(IRepository<BDOUser> repository)
             : base(repository)
         { }
@@ -22,6 +29,11 @@ namespace InstantMessenger.DataModel.BRO
             return Repository.CreateQuery()
                              .Where(x => x.Username.StartsWith(username))
                              .ToList();
+        }
+
+        public void LogoutAllUsers()
+        {
+            Repository.CreateSQL(QLogoutAllUsers);
         }
     }
 }

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Reflection;
+﻿using System.Reflection;
 using AutoMapper;
 using AutoMapper.Mappers;
 using Castle.Core;
@@ -24,29 +23,20 @@ namespace InstantMessenger.Core.IoC
         public void Install(IWindsorContainer container, IConfigurationStore store)
         {
             container.Kernel.ComponentRegistered += KernelOnComponentRegistered;
-            container.Kernel.DependencyResolving += KernelOnDependencyResolving;
-            container.Kernel.ComponentCreated += KernelOnComponentCreated;
             
             container.Register(
                 Component.For<ISessionFactory>().UsingFactoryMethod(CreateSessionFactory).LifeStyle.Singleton,
                 Component.For<UnitOfWorkInterceptor>().LifeStyle.Transient,
                 Component.For<IUnitOfWork>().ImplementedBy<UnitOfWork>().LifeStyle.PerThread,
                 Component.For<IConfiguration>().UsingFactoryMethod(CreateAutoMapperConfiguration).LifeStyle.Singleton,
-                Component.For<IRepository<IBDO>>().ImplementedBy<Repository<IBDO>>().LifeStyle.Transient,
+                Component.For(typeof(IRepository<>)).ImplementedBy(typeof(Repository<>)).LifeStyle.Transient,
 
                 Classes.FromAssembly(DataModelAssembly).BasedOn(typeof(BROGeneric<>)).LifestyleSingleton(),
-                Classes.FromAssembly(DataModelAssembly).BasedOn<IDataManager>().WithService.DefaultInterfaces().LifestyleSingleton()
+                Classes.FromAssembly(DataModelAssembly).BasedOn<DataManagerBase>()
+                                                       .WithService.DefaultInterfaces()
+                                                       .WithService.Self()
+                                                       .LifestyleSingleton()
             );
-        }
-
-        private void KernelOnComponentCreated(ComponentModel model, object instance)
-        {
-
-        }
-
-        private void KernelOnDependencyResolving(ComponentModel client, DependencyModel model, object dependency)
-        {
-
         }
 
         private void KernelOnComponentRegistered(string key, IHandler handler)

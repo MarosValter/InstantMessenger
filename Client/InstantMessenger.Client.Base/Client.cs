@@ -26,13 +26,13 @@ namespace InstantMessenger.Client.Base
 
         private const int ReconnectTimeout = 3000;
         private const int ReconnectAttempts = 3;
-        private const int Timeout = 30000;
+        private const int Timeout = 3000000;
 
         #endregion
 
         #region Attributes
 
-        private static readonly TcpClient _client;
+        private static TcpClient _client;
         private static string _host;
         private static int _port;
         private static SslStream _stream;
@@ -101,7 +101,7 @@ namespace InstantMessenger.Client.Base
 
             try
             {
-                _client.Connect(_host, _port);
+                _client = new TcpClient(_host, _port);
                 _stream = new SslStream(_client.GetStream(), false, UserCertificateValidationCallback);
                 _stream.AuthenticateAsClient("localhost");
 
@@ -154,12 +154,10 @@ namespace InstantMessenger.Client.Base
             if (_client != null)
             {
                 _client.Client.Close();
-                _client.Close();
             }
             if (_stream != null)
             {
                 _stream.Close();
-                _stream.Dispose();
             }
 
             if (fire && Disconnected != null)
@@ -199,7 +197,15 @@ namespace InstantMessenger.Client.Base
         private static void DoWork(object sender, DoWorkEventArgs e)
         {
             var to = e.Argument as TransportObject;
-            to.Serialize(_stream);
+            try
+            {
+                to.Serialize(_stream);
+            }
+            catch (Exception)
+            {
+                Reconnect();
+            }
+            
 
             var result = TransportObject.Deserialize(_stream);
             e.Result = result;

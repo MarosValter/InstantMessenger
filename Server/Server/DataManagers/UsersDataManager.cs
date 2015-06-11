@@ -22,15 +22,12 @@ namespace InstantMessenger.DataModel.DataManagers
                   .ConstructProjectionUsing(src => Mapper.Map<BDOUser, UserFlat>(src.Friend));
         }
 
-        [UnitOfWork]
         public TransportObject LoginUser(TransportObject to)
         {
             var username = to.Get<string>("Username");
             var pwdHash = to.Get<byte[]>("Password");
 
             var dto = new TransportObject();
-
-            //var broUsers = ObjectFactory.GetInstance<BROUsers>();
 
             var user = ObjectFactory.GetInstance<BROUsers>().GetUserByUsername(username);
 
@@ -58,7 +55,6 @@ namespace InstantMessenger.DataModel.DataManagers
             user.IsOnline = true;
 
             ObjectFactory.GetInstance<BROUsers>().Update(user);
-
             var flat = Mapper.Map<BDOUser, UserFlat>(user);
 
             dto.Type = Protocol.MessageType.IM_OK;
@@ -70,7 +66,6 @@ namespace InstantMessenger.DataModel.DataManagers
 
         public void Logout(long oid)
         {
-            //var bro = ObjectFactory.GetInstance<BROUsers>();
             var user = ObjectFactory.GetInstance<BROUsers>().GetByOid(oid);
             user.IsOnline = false;
             user.LastLogin = DateTime.Now;
@@ -85,7 +80,6 @@ namespace InstantMessenger.DataModel.DataManagers
 
             var dto = new TransportObject();
 
-            //var bro = ObjectFactory.GetInstance<BROUsers>();
             var user = ObjectFactory.GetInstance<BROUsers>().GetUserByUsername(username);
 
             if (user != null)
@@ -109,20 +103,11 @@ namespace InstantMessenger.DataModel.DataManagers
         }
 
         [UnitOfWork]
-        public TransportObject MainWindowInit(TransportObject to)
+        public virtual TransportObject MainWindowInit(TransportObject to)
         {
-            //var broFriendship = ObjectFactory.GetInstance<BROFriendship>();
             var myOid = to.Get<long>("MyOid");
-
             var friends = ObjectFactory.GetInstance<BROFriendship>().GetFriendsByUser(myOid);
             var friendFlats = Mapper.Map<IList<BDOFriendship>, IList<UserFlat>>(friends);
-            //var friendFlats = friends.Select(x => new UserFlat
-            //{
-            //    OID = x.Friend.OID,
-            //    Username = x.Friend.Username,
-            //    IsOnline = x.Friend.IsOnline
-            //}).ToList();
-
             var requestCount = ObjectFactory.GetInstance<BROFriendship>().GetUserRequestCount(myOid);
 
             var dto = new TransportObject(Protocol.MessageType.IM_OK);
@@ -139,12 +124,8 @@ namespace InstantMessenger.DataModel.DataManagers
             var flats = Mapper.Map<IList<BDOUser>, IList<UserFlat>>(users);
 
             var dto = new TransportObject(Protocol.MessageType.IM_OK);
-            //var flats = new List<UserFlat>(users.Count);
-            //flats.AddRange(users.Select(user => new UserFlat
-            //{
-            //    OID = user.OID, Username = user.Username
-            //}));
             dto.Add("Users", flats);
+
             return dto;
         }
     }

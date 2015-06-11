@@ -18,18 +18,13 @@ namespace InstantMessenger.DataModel.DataManagers
             mapper.CreateMap<BDOFriendship, RequestFlat>();
         }
 
-        public TransportObject GetRequests(TransportObject to)
+        [UnitOfWork]
+        public virtual TransportObject GetRequests(TransportObject to)
         {
             var myOid = to.Get<long>("MyOid");
 
             var requests = ObjectFactory.GetInstance<BROFriendship>().GetUserRequests(myOid);
             var requestFlats = AutoMapper.Mapper.Map<IList<BDOFriendship>, IList<RequestFlat>>(requests);
-            //var requestFlats = requests.Select(x => new RequestFlat
-            //{
-            //    UserOID = x.User.OID,
-            //    UserUsername = x.User.Username,
-            //    Created = x.Created
-            //}).ToList();
 
             var dto = new TransportObject(Protocol.MessageType.IM_OK);
             dto.Add("Requests", requestFlats);
@@ -41,9 +36,6 @@ namespace InstantMessenger.DataModel.DataManagers
         {
             var senderOid = to.Get<long>("MyOid");
             var recipientOid = to.Get<long>("UserOid");
-
-            //var broUsers = ObjectFactory.GetInstance<BROUsers>();
-            //var broFriendship = ObjectFactory.GetInstance<BROFriendship>();
 
             var sender = ObjectFactory.GetInstance<BROUsers>().GetByOid(senderOid);
             var recipient = ObjectFactory.GetInstance<BROUsers>().GetByOid(recipientOid);
@@ -76,13 +68,10 @@ namespace InstantMessenger.DataModel.DataManagers
         }
 
         [UnitOfWork]
-        public TransportObject AcceptRequest(TransportObject to)
+        public virtual TransportObject AcceptRequest(TransportObject to)
         {
             var userOid = to.Get<long>("UserOid");
             var myOid = to.Get<long>("MyOid");
-
-            //var broUsers = ObjectFactory.GetInstance<BROUsers>();
-            //var broFriendship = ObjectFactory.GetInstance<BROFriendship>();
 
             var sender = ObjectFactory.GetInstance<BROUsers>().GetByOid(myOid);
             var recipient = ObjectFactory.GetInstance<BROUsers>().GetByOid(userOid);

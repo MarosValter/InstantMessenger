@@ -1,6 +1,4 @@
 ﻿using System.Reflection;
-using AutoMapper;
-using AutoMapper.Mappers;
 using Castle.Core;
 using Castle.MicroKernel;
 using Castle.MicroKernel.Registration;
@@ -28,7 +26,7 @@ namespace InstantMessenger.Core.IoC
                 Component.For<ISessionFactory>().UsingFactoryMethod(CreateSessionFactory).LifeStyle.Singleton,
                 Component.For<UnitOfWorkInterceptor>().LifeStyle.Transient,
                 Component.For<IUnitOfWork>().ImplementedBy<UnitOfWork>().LifeStyle.PerThread,
-                Component.For<IConfiguration>().UsingFactoryMethod(CreateAutoMapperConfiguration).LifeStyle.Singleton,
+                //Component.For<IConfiguration>().UsingFactoryMethod(CreateAutoMapperConfiguration).LifeStyle.Singleton,
                 Component.For(typeof(IRepository<>)).ImplementedBy(typeof(Repository<>)).LifeStyle.Transient,
 
                 Classes.FromAssembly(DataModelAssembly).BasedOn(typeof(BROGeneric<>)).LifestyleSingleton(),
@@ -67,10 +65,10 @@ namespace InstantMessenger.Core.IoC
                 .BuildSessionFactory();
         }
 
-        private static IConfiguration CreateAutoMapperConfiguration()
-        {
-            return new ConfigurationStore(new TypeMapFactory(), MapperRegistry.Mappers);
-        }
+        //private static IConfiguration CreateAutoMapperConfiguration()
+        //{
+        //    return new ConfigurationStore(new TypeMapFactory(), MapperRegistry.Mappers);
+        //}
 
         #endregion
     }

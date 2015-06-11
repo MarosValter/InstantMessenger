@@ -13,13 +13,11 @@ namespace InstantMessenger.Core
             // Build ISessionFactory
             ObjectFactory.GetInstance<IUnitOfWork>();
 
-            //var config = ObjectFactory.GetInstance<IConfiguration>();
             var dataManagers = ObjectFactory.GetAllInstances<IDataManager>();
             Mapper.Initialize(cfg => 
             { 
                 Parallel.ForEach(dataManagers, dm => dm.RegisterMapping(cfg));
             });
-            //config.Seal();
             
         }
     }

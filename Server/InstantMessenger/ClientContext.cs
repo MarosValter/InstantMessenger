@@ -115,7 +115,9 @@ namespace InstantMessenger.Server
                     result = ObjectFactory.GetInstance<FriendshipsDataManager>().DeleteRequest(to);
                     break;
             }
-            
+
+            var modelGuid = to.Get<Guid>("ModelGuid");
+            result.Add("ModelGuid", modelGuid);
             result.Serialize(Stream);
         }
 

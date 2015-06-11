@@ -46,6 +46,7 @@ namespace InstantMessenger.Client.Base
 
         private void SendRequest(TransportObject to)
         {
+            to.Add("ModelGuid", ModelGuid);
             Client.SendRequest(to, this);
         }
 

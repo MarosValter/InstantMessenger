@@ -19,6 +19,7 @@ namespace InstantMessenger.Common.TransportObject
             {4, typeof (byte[])},
             {5, typeof (int)},
             {6, typeof (RequestFlat)},
+            {7, typeof (Guid)},
             {30, typeof(List<>)},
         };
 

@@ -1,16 +1,25 @@
 ﻿using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Net.Security;
 using System.Net.Sockets;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Timers;
+using System.Windows;
 using InstantMessenger.Common;
 using InstantMessenger.Common.TransportObject;
 using Timer = System.Timers.Timer;
 
 namespace InstantMessenger.Client.Base
 {
+    public enum State
+    {
+        Connected,
+        Disconnected,
+        Reconnecting,
+    }
     public static class Client
     {
         #region Events
@@ -18,7 +27,6 @@ namespace InstantMessenger.Client.Base
         public static event EventHandler Connected;
         public static event EventHandler Disconnected;
         public static event EventHandler<int> Reconnecting;
-        //public static event EventHandler<TransportObject> DataReceived;
 
         #endregion
 
@@ -32,47 +40,31 @@ namespace InstantMessenger.Client.Base
 
         #region Attributes
 
+        private static volatile State _connectionState;
+
         private static TcpClient _client;
         private static string _host;
         private static int _port;
         private static SslStream _stream;
-        private static ModelBase _requestingModel;
 
-        private static readonly BackgroundWorker _worker;
-        private static readonly Timer _timer;
+        private static readonly ConcurrentDictionary<Guid, ModelBase> ModelDictionary; 
+
+        private static readonly BackgroundWorker SendWorker;
+        private static readonly Timer SendTimer;
+        private static readonly Queue<TransportObject> SendCache;
+        private static volatile bool _isSending;
+
+        private static readonly BackgroundWorker ReceiveWorker;
 
         private static long? _myOid;
 
-        public static bool IsConnected
+        private static bool IsConnected
         {
-            get
-            {
-                return _client != null &&
-                       _client.Client != null &&
-                       _client.Client.IsBound &&
-                       _stream != null &&
-                       _stream.IsAuthenticated;
-            }
+            get { return _connectionState == State.Connected; }
         }
 
-        private static readonly ReaderWriterLockSlim SlimLock= new ReaderWriterLockSlim();
-        private static bool _isWorking;
-        public static bool IsWorking
-        {
-            get
-            {
-                SlimLock.EnterReadLock();
-                var result = _isWorking;
-                SlimLock.ExitReadLock();
-                return result;
-            }
-            set
-            {
-                SlimLock.TryEnterWriteLock(50);
-                _isWorking = value;
-                SlimLock.ExitWriteLock();
-            }
-        }
+        private static bool IsDisconnected { get { return _connectionState == State.Disconnected; } }
+        private static bool IsReconnecting { get { return _connectionState == State.Reconnecting; } }
 
         #endregion
 
@@ -80,14 +72,23 @@ namespace InstantMessenger.Client.Base
 
         static Client()
         {
+            _connectionState = State.Disconnected;
             _client = new TcpClient();
 
-            _timer = new Timer(Timeout);
-            _timer.Elapsed += TimerTimeout;
+            ModelDictionary = new ConcurrentDictionary<Guid, ModelBase>();
 
-            _worker = new BackgroundWorker();
-            _worker.DoWork += DoWork;
-            _worker.RunWorkerCompleted += WorkerCompleted;
+            SendTimer = new Timer(Timeout);
+            SendTimer.Elapsed += SendTimerTimeout;
+
+            SendWorker = new BackgroundWorker();
+            SendWorker.DoWork += SendWorkerDoWork;
+            SendWorker.RunWorkerCompleted += SendWorkerCompleted;
+
+            SendCache = new Queue<TransportObject>();
+
+            ReceiveWorker = new BackgroundWorker();
+            ReceiveWorker.DoWork += ReceiveWorkerDoWork;
+            ReceiveWorker.RunWorkerCompleted += ReceiveWorkerCompleted;
         }
 
         #endregion
@@ -105,31 +106,29 @@ namespace InstantMessenger.Client.Base
                 _stream = new SslStream(_client.GetStream(), false, UserCertificateValidationCallback);
                 _stream.AuthenticateAsClient("localhost");
 
+                _connectionState = State.Connected;
+                ReceiveWorker.RunWorkerAsync();
 
                 if (Connected != null)
                     Connected(null, null);
             }
             catch (Exception)
             {
-                if (showMessage)
-                {
-                    //MessageBox.Show(Properties.Messages.E001, Properties.Messages.Error, MessageBoxButton.OK,
-                    //                MessageBoxImage.Error);
-                }
-                else
-                {
-                    throw;
-                }
+                throw;
             }
         }
 
         private static void Reconnect()
         {
-            var attempt = 1;
-            if (IsConnected)
-                Disconnect(false);
+            if (IsReconnecting)
+                return;
 
-            while (!IsConnected && attempt <= ReconnectAttempts)
+            _connectionState = State.Reconnecting;
+            var attempt = 1;
+
+            Disconnect(false);
+
+            while (IsDisconnected && attempt <= ReconnectAttempts)
             {
                 if (Reconnecting != null)
                     Reconnecting(null, attempt);
@@ -151,6 +150,9 @@ namespace InstantMessenger.Client.Base
 
         public static void Disconnect(bool fire)
         {
+            if (!IsConnected)
+                return;
+
             if (_client != null)
             {
                 _client.Client.Close();
@@ -160,8 +162,12 @@ namespace InstantMessenger.Client.Base
                 _stream.Close();
             }
 
-            if (fire && Disconnected != null)
-                Disconnected(null, null);
+            if (fire)
+            {
+                _connectionState = State.Disconnected;
+                if (Disconnected != null)
+                    Disconnected(null, null);
+            }
         }
 
         #endregion
@@ -171,31 +177,82 @@ namespace InstantMessenger.Client.Base
             _host = host;
             _port = port;
         }
-        private static void WorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            _timer.Stop();
-            IsWorking = false;
 
-            TransportObject result;
-            if (e.Cancelled || e.Error != null)
+        private static void ReceiveWorkerCompleted(object sender, RunWorkerCompletedEventArgs runWorkerCompletedEventArgs)
+        {
+            Reconnect();
+        }
+
+        private static void ReceiveWorkerDoWork(object sender, DoWorkEventArgs doWorkEventArgs)
+        {
+            try
             {
-                result = new TransportObject(Protocol.MessageType.IM_ERROR);
-                result.Add("Error", e.Error.Message);
+                while (IsConnected)
+                {
+                    var to = TransportObject.Deserialize(_stream);
+                    var modelGuid = to.Get<Guid>("ModelGuid");
+                    var model = ModelDictionary[modelGuid];
+
+                    if (Application.Current.Dispatcher.CheckAccess())
+                    {
+                        model.GetResponse(to);
+                    }
+                    else
+                    {
+                        Application.Current.Dispatcher.BeginInvoke(new Action(() => model.GetResponse(to)));
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+
+            }   
+
+        }
+
+        private static void SendWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            SendTimer.Stop();
+
+            if (SendCache.Count != 0 && e.Error != null)
+            {
+                var to = SendCache.Dequeue();
+                SendWorker.RunWorkerAsync(to);
             }
             else
             {
-                result = e.Result as TransportObject;
-                if (result != null && !_myOid.HasValue)
-                {
-                    _myOid = result.Get<long?>("MyOid");
-                }
-            }
+                //TransportObject result;
+                //if (e.Cancelled || e.Error != null)
+                //{
+                //    result = new TransportObject(Protocol.MessageType.IM_ERROR);
+                //    result.Add("Error", e.Error.Message);
+                //}
+                //else
+                //{
+                //    result = e.Result as TransportObject;
+                //    if (result != null && !_myOid.HasValue)
+                //    {
+                //        _myOid = result.Get<long?>("MyOid");
+                //    }
+                //}
 
-            _requestingModel.GetResponse(result);
+                //_requestingModel.GetResponse(result);
+                _isSending = false;
+            }
         }
 
-        private static void DoWork(object sender, DoWorkEventArgs e)
+        private static void SendWorkerDoWork(object sender, DoWorkEventArgs e)
         {
+            if (_host.IsNullOrEmpty())
+            {
+                throw new Exception("Host is not set. You must set host and port before sending request");
+            }
+
+            if (IsDisconnected)
+            {
+                Connect(false);
+            }
+
             var to = e.Argument as TransportObject;
             try
             {
@@ -205,13 +262,9 @@ namespace InstantMessenger.Client.Base
             {
                 Reconnect();
             }
-            
-
-            var result = TransportObject.Deserialize(_stream);
-            e.Result = result;
         }
 
-        private static void TimerTimeout(object sender, ElapsedEventArgs e)
+        private static void SendTimerTimeout(object sender, ElapsedEventArgs e)
         {
             Reconnect();
         }
@@ -219,29 +272,25 @@ namespace InstantMessenger.Client.Base
 
         public static void SendRequest(TransportObject to, ModelBase model)
         {
-            if (_host.IsNullOrEmpty())
+            var modelGuid = to.Get<Guid>("ModelGuid");
+            if (!ModelDictionary.ContainsKey(modelGuid))
             {
-                throw new Exception("Host is not set. You must set host and port before sending request");
+                ModelDictionary[modelGuid] = model;
             }
 
-            if (!IsConnected)
+            if (_isSending)
             {
-                Connect(false);
-                //throw new Exception("Not connected to server. Connect before sending request.");
-            }
-
-            if (IsWorking)
-            {
-                //TODO
+                SendCache.Enqueue(to);
+                return;
             }
 
             if (_myOid.HasValue)
             {
                 to.Add("MyOid", _myOid);
             }
-            _requestingModel = model;
-            _timer.Start();
-            _worker.RunWorkerAsync(to);
+
+            SendTimer.Start();
+            SendWorker.RunWorkerAsync(to);
         }
 
         #region Other methods

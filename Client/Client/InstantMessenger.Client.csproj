@@ -90,6 +90,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="FindScreen\FindModel.cs" />
+    <Compile Include="LoginScreen\CircularProgressBar.xaml.cs" />
     <Compile Include="LoginScreen\LoginModel.cs" />
     <Compile Include="MainWindow\MainModel.cs" />
     <Compile Include="RegisterScreen\RegisterModel.cs" />
@@ -110,6 +111,10 @@
       <DependentUpon>Body.xaml</DependentUpon>
     </Compile>
     <Compile Include="TabItem\TabPanel.cs" />
+    <Page Include="LoginScreen\CircularProgressBar.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="TabItem\CloseHeader.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

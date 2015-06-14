@@ -15,7 +15,9 @@ namespace InstantMessenger.DataModel.DataManagers
     {
         public override void RegisterMapping(AutoMapper.IConfiguration mapper)
         {
-            mapper.CreateMap<BDOFriendship, RequestFlat>();
+            mapper.CreateMap<BDOFriendship, RequestFlat>()
+                  .ForMember(dest => dest.UserOID, opt => opt.MapFrom(src => src.User.OID))
+                  .ForMember(dest => dest.Username, opt => opt.MapFrom(src => src.User.Username));
         }
 
         [UnitOfWork]

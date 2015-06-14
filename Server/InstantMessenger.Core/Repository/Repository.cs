@@ -122,7 +122,8 @@ namespace InstantMessenger.Core.Repository
         }
 
         /// <summary>
-        /// Creates IQueryable object, that can be further developed.
+        /// Creates IQueryable object, that can be further extended.
+        /// Calling method must be virtual and has an <see cref="UnitOfWorkAttribute"/>.
         /// </summary>
         /// <returns></returns>
         public IQueryable<T> CreateQuery()
@@ -131,8 +132,9 @@ namespace InstantMessenger.Core.Repository
         }
 
         /// <summary>
-        /// Creates IQueryable object based on given entity, that can be further developed.
-        /// Typically used with <see cref="Any()"/>.
+        /// Creates IQueryable object based on given entity, that can be further extended.
+        /// Calling method must be virtual and has an <see cref="UnitOfWorkAttribute"/>.
+        /// Typically used with <see cref="Any"/>.
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
@@ -143,7 +145,7 @@ namespace InstantMessenger.Core.Repository
 
         /// <summary>
         /// Determines, wheter exists given entity in Repository.
-        /// Can be developed with further queries.
+        /// Can be extended with further queries.
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>

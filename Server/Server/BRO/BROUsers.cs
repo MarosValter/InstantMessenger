@@ -2,6 +2,7 @@
 using System.Linq;
 using InstantMessenger.Core.Base;
 using InstantMessenger.Core.Base.Implementation;
+using InstantMessenger.Core.UOW;
 using InstantMessenger.DataModel.BDO;
 
 namespace InstantMessenger.DataModel.BRO
@@ -10,8 +11,8 @@ namespace InstantMessenger.DataModel.BRO
     {
         #region SQL queries
 
-        private const string QLogoutAllUsers = "UPDATE T01Users " +
-                                               "SET T01IsOnline = 'False'";
+        private const string QLogoutAllUsers = "UPDATE BDOUser " +
+                                               "SET IsOnline = 0";
 
         #endregion
 
@@ -26,14 +27,13 @@ namespace InstantMessenger.DataModel.BRO
 
         public IList<BDOUser> GetUsersStartingNameWith(string username)
         {
-            return Repository.CreateQuery()
-                             .Where(x => x.Username.StartsWith(username))
-                             .ToList();
+            return Repository.CreateQuery().Where(x => x.Username.StartsWith(username)).ToList();
         }
 
-        public void LogoutAllUsers()
+        [UnitOfWork]
+        public virtual void LogoutAllUsers()
         {
-            Repository.CreateSQL(QLogoutAllUsers);
+            Repository.CreateHQL(QLogoutAllUsers).ExecuteUpdate();
         }
     }
 }

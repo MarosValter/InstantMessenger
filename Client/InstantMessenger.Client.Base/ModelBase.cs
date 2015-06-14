@@ -9,7 +9,9 @@ namespace InstantMessenger.Client.Base
 {
     public abstract class ModelBase : INotifyPropertyChanged
     {
-        public event EventHandler<TransportObject> DataReceived;
+        public event EventHandler<TransportObject> BeforeProcessResponse;
+        internal event EventHandler<string> ErrorReceived;
+        public event EventHandler<TransportObject> AfterDataReceived;
 
         public bool Success;
         public string Error;
@@ -18,7 +20,14 @@ namespace InstantMessenger.Client.Base
         protected ModelBase()
         {
             Success = false;
-            ModelGuid = new Guid();
+            ModelGuid = Guid.NewGuid();
+            Client.Disconnected += ClientOnDisconnected;
+        }
+
+        private void ClientOnDisconnected(object sender, EventArgs eventArgs)
+        {
+            if (ErrorReceived != null)
+                ErrorReceived(this, "Server is unavailable.");
         }
 
         public virtual void OKACtion()
@@ -62,17 +71,20 @@ namespace InstantMessenger.Client.Base
             if (to.Type == Protocol.MessageType.IM_OK)
             {
                 Success = true;
+                if (BeforeProcessResponse != null)
+                    BeforeProcessResponse(this, to); 
                 ProcessResponse(to);
             }
             else
             {
                 Success = false;
-                Error = to.Get<string>("Error");
+                var error = to.Get<string>("Error");
+                if (ErrorReceived != null)
+                    ErrorReceived(this, error);
             }
 
-            var handler = DataReceived;
-            if (handler != null)
-                handler(this, to);          
+            if (AfterDataReceived != null)
+                AfterDataReceived(this, to);
         }
 
         protected virtual void ProcessResponse(TransportObject to)
@@ -80,6 +92,7 @@ namespace InstantMessenger.Client.Base
             
         }
 
+        #region PropertyChanged
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -89,5 +102,7 @@ namespace InstantMessenger.Client.Base
             var handler = PropertyChanged;
             if (handler != null) handler(this, new PropertyChangedEventArgs(propertyName));
         }
+
+        #endregion
     }
 }

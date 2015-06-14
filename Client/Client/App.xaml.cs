@@ -13,7 +13,7 @@ namespace InstantMessenger.Client
         public void Application_Startup(object sender, StartupEventArgs e)
         {
             Base.Client.Init(Settings.Default.Hostname, Settings.Default.Port);
-            Base.Client.Connect(true);
+            //Base.Client.Connect(true);
 
             var login = new LoginScreen.LoginScreen();
             var main = new MainWindow.MainWindow();

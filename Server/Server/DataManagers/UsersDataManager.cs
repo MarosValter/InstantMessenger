@@ -58,7 +58,6 @@ namespace InstantMessenger.DataModel.DataManagers
             var flat = Mapper.Map<BDOUser, UserFlat>(user);
 
             dto.Type = Protocol.MessageType.IM_OK;
-            dto.Add("MyOid", user.OID);
             dto.Add("UserFlat", flat);
 
             return dto;
@@ -107,17 +106,22 @@ namespace InstantMessenger.DataModel.DataManagers
         {
             var myOid = to.Get<long>("MyOid");
             var friends = ObjectFactory.GetInstance<BROFriendship>().GetFriendsByUser(myOid);
-            var friendFlats = Mapper.Map<IList<BDOFriendship>, IList<UserFlat>>(friends);
             var requestCount = ObjectFactory.GetInstance<BROFriendship>().GetUserRequestCount(myOid);
+            var user = ObjectFactory.GetInstance<BROUsers>().GetByOid(myOid);
+
+            var friendFlats = Mapper.Map<IList<BDOFriendship>, IList<UserFlat>>(friends);
+            var flat = Mapper.Map<BDOUser, UserFlat>(user);
 
             var dto = new TransportObject(Protocol.MessageType.IM_OK);
             dto.Add("Friends", friendFlats);
             dto.Add("RequestCount", requestCount);
+            dto.Add("UserFlat", flat);
 
             return dto;
         }
 
-        public TransportObject FindUsers(TransportObject to)
+        [UnitOfWork]
+        public virtual TransportObject FindUsers(TransportObject to)
         {
             var username = to.Get<string>("Username");
             var users = ObjectFactory.GetInstance<BROUsers>().GetUsersStartingNameWith(username);

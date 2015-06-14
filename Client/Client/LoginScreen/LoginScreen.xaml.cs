@@ -1,11 +1,7 @@
-﻿using System;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Forms;
 using InstantMessenger.Client.Base;
-using InstantMessenger.Common;
 using InstantMessenger.Common.TransportObject;
-using MessageBox = System.Windows.MessageBox;
 
 namespace InstantMessenger.Client.LoginScreen
 {
@@ -27,11 +23,12 @@ namespace InstantMessenger.Client.LoginScreen
         {
 
             Init(new LoginModel());
-            //_client = client;
             InitializeComponent();
-            Model.DataReceived += ModelOnDataReceived;
+            Model.BeforeProcessResponse += ModelOnBeforeProcessResponse;
+            Model.AfterDataReceived += ModelOnAfterDataReceived;
             _txtUsername.Focus();
-        }
+            ProgressBar.Visibility = Visibility.Hidden;
+        }        
 
         #endregion
 
@@ -44,16 +41,14 @@ namespace InstantMessenger.Client.LoginScreen
 
         #region Event handlers
 
-        private void ModelOnDataReceived(object sender, TransportObject transportObject)
+        private void ModelOnBeforeProcessResponse(object sender, TransportObject transportObject)
+        {            
+            Close();
+        }
+
+        private void ModelOnAfterDataReceived(object sender, TransportObject transportObject)
         {
-            if (Model.Success)
-            {
-                Close();
-            }
-            else
-            {
-                MessageBox.Show(this, Model.Error, Properties.Resources.Error, MessageBoxButton.OK, MessageBoxImage.Exclamation);
-            }
+            ProgressBar.Visibility = Visibility.Hidden;
         }
 
         private void Hyperlink_OnClick(object sender, RoutedEventArgs e)
@@ -73,6 +68,12 @@ namespace InstantMessenger.Client.LoginScreen
         }
 
         #endregion Event handlers
+
+        protected override void OKButtonAction()
+        {
+            ProgressBar.Visibility = Visibility.Visible;
+            base.OKButtonAction();
+        }
 
         protected override bool Validate()
         {

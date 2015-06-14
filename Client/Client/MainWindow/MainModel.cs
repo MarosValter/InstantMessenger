@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Timers;
 using InstantMessenger.Client.Base;
 using InstantMessenger.Common;
 using InstantMessenger.Common.Flats;
@@ -12,8 +14,10 @@ namespace InstantMessenger.Client.MainWindow
     {
         #region Attributes
 
-        private ObservableCollection<UserFlat> _onlineFriends;
+        private readonly Timer _refreshTimer;
+        private const long RefreshTime = 1000;
 
+        private ObservableCollection<UserFlat> _onlineFriends;
         public ObservableCollection<UserFlat> OnlineFriends
         {
             get {return _onlineFriends;}
@@ -25,8 +29,8 @@ namespace InstantMessenger.Client.MainWindow
                 OnPropertyChanged();
             }
         }
-        private ObservableCollection<UserFlat> _offlineFriends;
 
+        private ObservableCollection<UserFlat> _offlineFriends;
         public ObservableCollection<UserFlat> OfflineFriends
         {
             get { return _offlineFriends; }
@@ -54,6 +58,19 @@ namespace InstantMessenger.Client.MainWindow
 
         public string RequestCountGui { get { return string.Format("({0})", _requestCount); } }
 
+        private string _username;
+        public string Username
+        {
+            get { return _username; }
+            private set
+            {
+                if (_username == value)
+                    return;
+                _username = value;
+                OnPropertyChanged();
+            }
+        }
+
         #endregion
 
         #region Constructor
@@ -62,6 +79,10 @@ namespace InstantMessenger.Client.MainWindow
         {
             OnlineFriends = new ObservableCollection<UserFlat>();
             OfflineFriends = new ObservableCollection<UserFlat>();
+
+            _refreshTimer = new Timer(RefreshTime);
+            _refreshTimer.AutoReset = true;
+            _refreshTimer.Elapsed += (sender, args) => GetInitData();
         }
 
         #endregion
@@ -81,10 +102,17 @@ namespace InstantMessenger.Client.MainWindow
         {
             var friends = to.Get<List<UserFlat>>("Friends");
             var requestCount = to.Get<int>("RequestCount");
+            var flat = to.Get<UserFlat>("UserFlat");
 
             OnlineFriends = new ObservableCollection<UserFlat>(friends.Where(x => x.IsOnline));
             OfflineFriends = new ObservableCollection<UserFlat>(friends.Where(x => !x.IsOnline));
             RequestCount = requestCount;
+            Username = flat.Username;
+
+            if (!_refreshTimer.Enabled)
+            {
+                _refreshTimer.Start();
+            }
         }
 
         #endregion

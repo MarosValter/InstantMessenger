@@ -26,7 +26,6 @@ namespace InstantMessenger.Core.IoC
                 Component.For<ISessionFactory>().UsingFactoryMethod(CreateSessionFactory).LifeStyle.Singleton,
                 Component.For<UnitOfWorkInterceptor>().LifeStyle.Transient,
                 Component.For<IUnitOfWork>().ImplementedBy<UnitOfWork>().LifeStyle.PerThread,
-                //Component.For<IConfiguration>().UsingFactoryMethod(CreateAutoMapperConfiguration).LifeStyle.Singleton,
                 Component.For(typeof(IRepository<>)).ImplementedBy(typeof(Repository<>)).LifeStyle.Transient,
 
                 Classes.FromAssembly(DataModelAssembly).BasedOn(typeof(BROGeneric<>)).LifestyleSingleton(),
@@ -47,7 +46,7 @@ namespace InstantMessenger.Core.IoC
 
             foreach (var method in handler.ComponentModel.Implementation.GetMethods())
             {
-                if (UnitOfWorkHelper.HasUnitOfWorkAttribute(method))
+                if (UnitOfWorkHelper.HasAttribute(method, typeof(UnitOfWorkAttribute)))
                 {
                     handler.ComponentModel.Interceptors.Add(new InterceptorReference(typeof(UnitOfWorkInterceptor)));
                     return;
@@ -64,11 +63,6 @@ namespace InstantMessenger.Core.IoC
                 .Mappings(m => m.FluentMappings.AddFromAssembly(DataModelAssembly))
                 .BuildSessionFactory();
         }
-
-        //private static IConfiguration CreateAutoMapperConfiguration()
-        //{
-        //    return new ConfigurationStore(new TypeMapFactory(), MapperRegistry.Mappers);
-        //}
 
         #endregion
     }

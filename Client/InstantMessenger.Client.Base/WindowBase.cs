@@ -34,6 +34,8 @@ namespace InstantMessenger.Client.Base
             RequestCommand = new RoutedUICommand("Request", "Request", typeof(WindowBase));
 
             CreateCommandBindings();
+            Model.ErrorReceived += ModelOnErrorReceived;
+            Client.Reconnecting += ClientOnReconnecting;
         }
 
         #endregion
@@ -142,6 +144,20 @@ namespace InstantMessenger.Client.Base
         protected virtual bool Validate()
         {
             return true;
+        }
+
+        #endregion
+
+        #region Event handlers
+
+        private void ModelOnErrorReceived(object sender, string s)
+        {
+            MessageBox.Show(s, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+
+        private void ClientOnReconnecting(object sender, int i)
+        {
+            throw new NotImplementedException();
         }
 
         #endregion

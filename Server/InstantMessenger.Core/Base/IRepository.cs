@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using InstantMessenger.Core.UOW;
 using NHibernate;
 using NHibernate.Mapping;
 
@@ -82,12 +83,14 @@ namespace InstantMessenger.Core.Base
 
         /// <summary>
         /// Creates an IQueryable object, that can be further extended.
+        /// Calling method must be virtual and has an <see cref="UnitOfWorkAttribute"/>.
         /// </summary>
         /// <returns></returns>
         IQueryable<T> CreateQuery();
 
         /// <summary>
         /// Creates an IQueryable object based on given entity, that can be further extended.
+        /// Calling method must be virtual and has an <see cref="UnitOfWorkAttribute"/>.
         /// Typically used with <see cref="Any"/>.
         /// </summary>
         /// <param name="entity"></param>

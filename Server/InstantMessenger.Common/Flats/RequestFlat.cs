@@ -10,7 +10,7 @@ namespace InstantMessenger.Common.Flats
         [ProtoMember(8)]
         public long UserOID { get; set; }
         [ProtoMember(9)]
-        public string UserUsername { get; set; }
+        public string Username { get; set; }
         [ProtoMember(10)]
         public DateTime Created { get; set; }
         [ProtoIgnore]

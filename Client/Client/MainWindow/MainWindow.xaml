@@ -38,6 +38,7 @@
                 <TextBlock Text="{Binding Path=RequestCountGui}" Grid.Column="2" Foreground="#FFFF3535"/>
             </Grid>
         </Button>
-        <Border BorderBrush="#FFACACAC" BorderThickness="1" Margin="0,2,1,1" Grid.Row="1"/>
+        <Border BorderBrush="#FFACACAC" BorderThickness="1" Margin="0,2,1,1" Grid.Row="1" Grid.Column="0"/>
+        <TextBlock x:Name="Header" Margin="5" TextWrapping="Wrap" Text="{Binding Path=Username}" FontSize="16" FontFamily="Segoe UI Light" TextAlignment="Center" Grid.Row="0" Grid.Column="0"/>
     </Grid>
 </base:WindowBase>

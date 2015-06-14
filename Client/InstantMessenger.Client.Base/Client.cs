@@ -9,6 +9,7 @@ using System.Threading;
 using System.Timers;
 using System.Windows;
 using InstantMessenger.Common;
+using InstantMessenger.Common.Flats;
 using InstantMessenger.Common.TransportObject;
 using Timer = System.Timers.Timer;
 
@@ -34,7 +35,7 @@ namespace InstantMessenger.Client.Base
 
         private const int ReconnectTimeout = 3000;
         private const int ReconnectAttempts = 3;
-        private const int Timeout = 3000000;
+        //private const int Timeout = 3000000;
 
         #endregion
 
@@ -50,7 +51,7 @@ namespace InstantMessenger.Client.Base
         private static readonly ConcurrentDictionary<Guid, ModelBase> ModelDictionary; 
 
         private static readonly BackgroundWorker SendWorker;
-        private static readonly Timer SendTimer;
+        //private static readonly Timer SendTimer;
         private static readonly Queue<TransportObject> SendCache;
         private static volatile bool _isSending;
 
@@ -58,11 +59,7 @@ namespace InstantMessenger.Client.Base
 
         private static long? _myOid;
 
-        private static bool IsConnected
-        {
-            get { return _connectionState == State.Connected; }
-        }
-
+        private static bool IsConnected { get { return _connectionState == State.Connected; } }
         private static bool IsDisconnected { get { return _connectionState == State.Disconnected; } }
         private static bool IsReconnecting { get { return _connectionState == State.Reconnecting; } }
 
@@ -77,8 +74,8 @@ namespace InstantMessenger.Client.Base
 
             ModelDictionary = new ConcurrentDictionary<Guid, ModelBase>();
 
-            SendTimer = new Timer(Timeout);
-            SendTimer.Elapsed += SendTimerTimeout;
+            //SendTimer = new Timer(Timeout);
+            //SendTimer.Elapsed += SendTimerTimeout;
 
             SendWorker = new BackgroundWorker();
             SendWorker.DoWork += SendWorkerDoWork;
@@ -95,7 +92,7 @@ namespace InstantMessenger.Client.Base
 
         #region Connection methods
 
-        public static void Connect(bool showMessage)
+        public static void Connect()
         {
             if (IsConnected)
                 return;
@@ -107,7 +104,8 @@ namespace InstantMessenger.Client.Base
                 _stream.AuthenticateAsClient("localhost");
 
                 _connectionState = State.Connected;
-                ReceiveWorker.RunWorkerAsync();
+                if (!ReceiveWorker.IsBusy)
+                    ReceiveWorker.RunWorkerAsync();
 
                 if (Connected != null)
                     Connected(null, null);
@@ -135,7 +133,7 @@ namespace InstantMessenger.Client.Base
 
                 try
                 {
-                    Connect(false);
+                    Connect();
                     return;
                 }
                 catch (Exception)
@@ -191,7 +189,13 @@ namespace InstantMessenger.Client.Base
                 {
                     var to = TransportObject.Deserialize(_stream);
                     var modelGuid = to.Get<Guid>("ModelGuid");
+                    var flat = to.Get<UserFlat>("UserFlat");
+
                     var model = ModelDictionary[modelGuid];
+                    if (!_myOid.HasValue)
+                    {
+                        _myOid = flat.OID;
+                    }
 
                     if (Application.Current.Dispatcher.CheckAccess())
                     {
@@ -212,7 +216,7 @@ namespace InstantMessenger.Client.Base
 
         private static void SendWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            SendTimer.Stop();
+            //SendTimer.Stop();
 
             if (SendCache.Count != 0 && e.Error != null)
             {
@@ -221,36 +225,22 @@ namespace InstantMessenger.Client.Base
             }
             else
             {
-                //TransportObject result;
-                //if (e.Cancelled || e.Error != null)
-                //{
-                //    result = new TransportObject(Protocol.MessageType.IM_ERROR);
-                //    result.Add("Error", e.Error.Message);
-                //}
-                //else
-                //{
-                //    result = e.Result as TransportObject;
-                //    if (result != null && !_myOid.HasValue)
-                //    {
-                //        _myOid = result.Get<long?>("MyOid");
-                //    }
-                //}
-
-                //_requestingModel.GetResponse(result);
                 _isSending = false;
             }
         }
 
         private static void SendWorkerDoWork(object sender, DoWorkEventArgs e)
         {
+            _isSending = true;
+
             if (_host.IsNullOrEmpty())
             {
                 throw new Exception("Host is not set. You must set host and port before sending request");
             }
 
-            if (IsDisconnected)
+            if (!IsConnected)
             {
-                Connect(false);
+                return;
             }
 
             var to = e.Argument as TransportObject;
@@ -264,10 +254,10 @@ namespace InstantMessenger.Client.Base
             }
         }
 
-        private static void SendTimerTimeout(object sender, ElapsedEventArgs e)
-        {
-            Reconnect();
-        }
+        //private static void SendTimerTimeout(object sender, ElapsedEventArgs e)
+        //{
+        //    Reconnect();
+        //}
       
 
         public static void SendRequest(TransportObject to, ModelBase model)
@@ -278,9 +268,10 @@ namespace InstantMessenger.Client.Base
                 ModelDictionary[modelGuid] = model;
             }
 
-            if (_isSending)
+            if (_isSending && SendWorker.IsBusy)
             {
-                SendCache.Enqueue(to);
+                if (IsConnected)
+                    SendCache.Enqueue(to);
                 return;
             }
 
@@ -289,7 +280,7 @@ namespace InstantMessenger.Client.Base
                 to.Add("MyOid", _myOid);
             }
 
-            SendTimer.Start();
+            //SendTimer.Start();
             SendWorker.RunWorkerAsync(to);
         }
 

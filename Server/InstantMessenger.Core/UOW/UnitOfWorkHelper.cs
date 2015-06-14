@@ -7,10 +7,9 @@ namespace InstantMessenger.Core.UOW
 {
     public static class UnitOfWorkHelper
     {
-        public static bool HasUnitOfWorkAttribute(MethodInfo methodInfo)
+        public static bool HasAttribute(MethodInfo methodInfo, Type attribute)
         {
-            return Attribute.IsDefined(methodInfo, typeof (UnitOfWorkAttribute));
-            //methodInfo.GetCustomAttributes(typeof (UnitOfWorkAttribute), false).Any();
+            return Attribute.IsDefined(methodInfo, attribute);
         }
 
         public static bool IsRepositoryMethod(MethodInfo methodInfo)

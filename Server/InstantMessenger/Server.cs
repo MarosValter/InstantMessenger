@@ -39,6 +39,7 @@ namespace InstantMessenger.Server
             Clients = new HashSet<ClientContext>();
             _cert = cert;
             _server = new TcpListener(IPAddress.Any, port);
+            ObjectFactory.GetInstance<BROUsers>().LogoutAllUsers();
             Start(); 
         }
 
@@ -173,8 +174,6 @@ namespace InstantMessenger.Server
             {
                 client.Dispose();
             }
-
-            ObjectFactory.GetInstance<BROUsers>().LogoutAllUsers();
         }
 
         #endregion

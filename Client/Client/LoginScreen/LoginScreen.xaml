@@ -3,24 +3,24 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:p="clr-namespace:InstantMessenger.Client.Properties"
         xmlns:base="clr-namespace:InstantMessenger.Client.Base;assembly=InstantMessenger.Client.Base"
+        xmlns:local="clr-namespace:InstantMessenger.Client.LoginScreen"
         x:Class="InstantMessenger.Client.LoginScreen.LoginScreen"
         Title="{x:Static p:Resources.Login}"
-        Height="350" Width="250"
+        Height="400" Width="250"
     >
     <Grid Margin="0">
         <Label x:Name="_lblUsername" Content="{x:Static p:Resources.UsernameColon}" HorizontalAlignment="Left" Margin="40,123,0,0" VerticalAlignment="Top" TabIndex="0"/>
         <TextBox x:Name="_txtUsername" Margin="40,149,40,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="18" BorderBrush="Gray"
-                 Text="{Binding Path=Username, Mode=TwoWay}">
-        </TextBox>
+			Text="{Binding Username, Mode=TwoWay}"/>
         <Label x:Name="_lblPassword" Content="{x:Static p:Resources.PasswordColon}" HorizontalAlignment="Left" Margin="40,172,0,0" VerticalAlignment="Top"/>
         <PasswordBox x:Name="_txtPassword" Margin="40,198,40,0" VerticalAlignment="Top" BorderBrush="Gray"
-                     PasswordChanged="_txtPassword_OnPasswordChanged">
-        </PasswordBox>
-        <Button x:Name="_btnLogin" Content="{x:Static p:Resources.Login}" Margin="84,230,84,0" Background="White" BorderBrush="Gray" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type base:WindowBase}}, Path=OKCommand}" Height="25" VerticalAlignment="Top">
-        </Button>
+			PasswordChanged="_txtPassword_OnPasswordChanged"/>
+        <Button x:Name="_btnLogin" Content="{x:Static p:Resources.Login}" Margin="84,230,84,0" Background="White" BorderBrush="Gray" Command="{Binding OKCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type base:WindowBase}}}" Height="25" VerticalAlignment="Top"/>
         <TextBlock Margin="0,0,0,10" TextWrapping="NoWrap" Text="{x:Static p:Resources.NotRegistered}" FontSize="11" FontStyle="Italic" VerticalAlignment="Bottom" HorizontalAlignment="Center" Width="140"><Hyperlink Click="Hyperlink_OnClick"><Run Text="{x:Static p:Resources.Register}"/></Hyperlink></TextBlock>
-        <Image x:Name="_logo" Margin="60,10,0,0" Source="../Resources/email.png" HorizontalAlignment="Left" Width="123" Height="86" VerticalAlignment="Top"/>
-        <Separator Height="10" Margin="0,276,0,0" VerticalAlignment="Top"/>
+        <Image x:Name="Logo" Margin="60,20,59,0" Source="../Resources/email.png" Height="86" VerticalAlignment="Top"/>
+        <Separator Margin="0,0,0,33" Height="10" VerticalAlignment="Bottom"/>
+
+        <local:CircularProgressBar x:Name="ProgressBar" Margin="99,272,98,0" VerticalAlignment="Top" Width="Auto"/>
 
     </Grid>
 </base:WindowBase>

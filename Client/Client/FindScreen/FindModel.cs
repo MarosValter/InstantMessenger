@@ -54,7 +54,9 @@ namespace InstantMessenger.Client.FindScreen
 
         protected override void ProcessResponse(TransportObject to)
         {
-            //Users = new ObservableCollection<UserFlat>(to.Get<List<UserFlat>>("Users"));
+            var users = to.Get<List<UserFlat>>("Users");
+            if (users != null)
+                Users = new ObservableCollection<UserFlat>(users);
         }
 
         #endregion

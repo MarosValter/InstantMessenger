@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using InstantMessenger.Client.Base.Annotations;
+using InstantMessenger.Client.Base.Properties;
 using InstantMessenger.Common;
 using InstantMessenger.Common.TransportObject;
 
@@ -14,13 +14,12 @@ namespace InstantMessenger.Client.Base
         public event EventHandler<TransportObject> AfterDataReceived;
 
         public bool Success;
-        public string Error;
-        public Guid ModelGuid;
+        private readonly Guid _modelGuid;
         
         protected ModelBase()
         {
             Success = false;
-            ModelGuid = Guid.NewGuid();
+            _modelGuid = Guid.NewGuid();
             Client.Disconnected += ClientOnDisconnected;
         }
 
@@ -55,7 +54,7 @@ namespace InstantMessenger.Client.Base
 
         private void SendRequest(TransportObject to)
         {
-            to.Add("ModelGuid", ModelGuid);
+            to.Add("ModelGuid", _modelGuid);
             Client.SendRequest(to, this);
         }
 

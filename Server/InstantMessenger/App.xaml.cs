@@ -15,7 +15,7 @@ namespace InstantMessenger.Server
         private void App_OnStartup(object sender, StartupEventArgs e)
         {
             Bootstrapper.Init();
-            var certPath = Path.Combine(Environment.CurrentDirectory, Settings.Default.CertificateName);
+            var certPath = Path.Combine(Environment.CurrentDirectory, Settings.Default.RelativeCertPath, Settings.Default.CertificateName);
             var cert = new X509Certificate2(certPath, Settings.Default.CertificatePassword);
 
             var main = new MainWindow(cert, Settings.Default.Port);

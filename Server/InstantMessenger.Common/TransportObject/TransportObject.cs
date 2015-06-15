@@ -86,10 +86,14 @@ namespace InstantMessenger.Common.TransportObject
             }
 
             Serializer.SerializeWithLengthPrefix(stream, Type, PrefixStyle.Base128);
-            Serializer.SerializeWithLengthPrefix(stream, _dict.Count, PrefixStyle.Base128);
+            Serializer.SerializeWithLengthPrefix(stream, _dict.Count(x => x.Value != null), PrefixStyle.Base128);
 
             foreach (var item in _dict)
             {
+                // we cant send null objects, but Get will yield null, if object was not sent
+                if (item.Value == null)
+                    continue;
+
                 Serializer.SerializeWithLengthPrefix(stream, item.Key, PrefixStyle.Base128);
                 Serializer.NonGeneric.SerializeWithLengthPrefix(stream, item.Value, PrefixStyle.Base128, GetNumByType(item.Value.GetType()));
             }

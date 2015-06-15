@@ -34,7 +34,7 @@ namespace InstantMessenger.Server.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("cert.pfx")]
+        [global::System.Configuration.DefaultSettingValueAttribute("test.pfx")]
         public string CertificateName {
             get {
                 return ((string)(this["CertificateName"]));
@@ -43,10 +43,19 @@ namespace InstantMessenger.Server.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("ku5revyve")]
+        [global::System.Configuration.DefaultSettingValueAttribute("test")]
         public string CertificatePassword {
             get {
                 return ((string)(this["CertificatePassword"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("..//..//..//cert")]
+        public string RelativeCertPath {
+            get {
+                return ((string)(this["RelativeCertPath"]));
             }
         }
     }

@@ -6,22 +6,21 @@ using System.Net.Security;
 using System.Net.Sockets;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading;
-using System.Timers;
 using System.Windows;
 using InstantMessenger.Common;
 using InstantMessenger.Common.Flats;
 using InstantMessenger.Common.TransportObject;
-using Timer = System.Timers.Timer;
 
 namespace InstantMessenger.Client.Base
 {
-    public enum State
+    internal enum State
     {
         Connected,
         Disconnected,
         Reconnecting,
     }
-    public static class Client
+
+    internal static class Client
     {
         #region Events
 
@@ -51,7 +50,6 @@ namespace InstantMessenger.Client.Base
         private static readonly ConcurrentDictionary<Guid, ModelBase> ModelDictionary; 
 
         private static readonly BackgroundWorker SendWorker;
-        //private static readonly Timer SendTimer;
         private static readonly Queue<TransportObject> SendCache;
         private static volatile bool _isSending;
 
@@ -92,7 +90,7 @@ namespace InstantMessenger.Client.Base
 
         #region Connection methods
 
-        public static void Connect()
+        private static void Connect()
         {
             if (IsConnected)
                 return;
@@ -126,7 +124,7 @@ namespace InstantMessenger.Client.Base
 
             Disconnect(false);
 
-            while (IsDisconnected && attempt <= ReconnectAttempts)
+            while (!IsConnected && attempt <= ReconnectAttempts)
             {
                 if (Reconnecting != null)
                     Reconnecting(null, attempt);
@@ -146,9 +144,9 @@ namespace InstantMessenger.Client.Base
             Disconnect(true);
         }
 
-        public static void Disconnect(bool fire)
+        private static void Disconnect(bool fire)
         {
-            if (!IsConnected)
+            if (IsDisconnected)
                 return;
 
             if (_client != null)
@@ -170,7 +168,7 @@ namespace InstantMessenger.Client.Base
 
         #endregion
 
-        public static void Init(string host, int port)
+        internal static void Init(string host, int port)
         {
             _host = host;
             _port = port;
@@ -192,7 +190,7 @@ namespace InstantMessenger.Client.Base
                     var flat = to.Get<UserFlat>("UserFlat");
 
                     var model = ModelDictionary[modelGuid];
-                    if (!_myOid.HasValue)
+                    if (!_myOid.HasValue && flat != null)
                     {
                         _myOid = flat.OID;
                     }
@@ -216,8 +214,6 @@ namespace InstantMessenger.Client.Base
 
         private static void SendWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            //SendTimer.Stop();
-
             if (SendCache.Count != 0 && e.Error != null)
             {
                 var to = SendCache.Dequeue();
@@ -252,20 +248,19 @@ namespace InstantMessenger.Client.Base
             {
                 Reconnect();
             }
-        }
+        }      
 
-        //private static void SendTimerTimeout(object sender, ElapsedEventArgs e)
-        //{
-        //    Reconnect();
-        //}
-      
-
-        public static void SendRequest(TransportObject to, ModelBase model)
+        internal static void SendRequest(TransportObject to, ModelBase model)
         {
             var modelGuid = to.Get<Guid>("ModelGuid");
             if (!ModelDictionary.ContainsKey(modelGuid))
             {
                 ModelDictionary[modelGuid] = model;
+            }
+
+            if (IsDisconnected)
+            {
+                Connect();
             }
 
             if (_isSending && SendWorker.IsBusy)
@@ -280,7 +275,6 @@ namespace InstantMessenger.Client.Base
                 to.Add("MyOid", _myOid);
             }
 
-            //SendTimer.Start();
             SendWorker.RunWorkerAsync(to);
         }
 

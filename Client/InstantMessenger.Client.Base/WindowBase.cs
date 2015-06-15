@@ -33,8 +33,7 @@ namespace InstantMessenger.Client.Base
             });
             RequestCommand = new RoutedUICommand("Request", "Request", typeof(WindowBase));
 
-            CreateCommandBindings();
-            Model.ErrorReceived += ModelOnErrorReceived;
+            CreateCommandBindings();           
             Client.Reconnecting += ClientOnReconnecting;
         }
 
@@ -44,6 +43,7 @@ namespace InstantMessenger.Client.Base
         {
             Model = model;
             DataContext = model;
+            Model.ErrorReceived += ModelOnErrorReceived;
         }
 
         #region Commands methods
@@ -157,7 +157,6 @@ namespace InstantMessenger.Client.Base
 
         private void ClientOnReconnecting(object sender, int i)
         {
-            throw new NotImplementedException();
         }
 
         #endregion

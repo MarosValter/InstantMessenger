@@ -66,9 +66,8 @@ namespace InstantMessenger.Core.UOW
 
         private static bool RequiresDbConnection(MethodInfo methodInfo)
         {
-            return (UnitOfWorkHelper.HasAttribute(methodInfo, typeof(UnitOfWorkAttribute)) ||
-                    UnitOfWorkHelper.IsRepositoryMethod(methodInfo)) &&
-                   !UnitOfWorkHelper.HasAttribute(methodInfo, typeof(UOWIgnoreAttribute));
+            return UnitOfWorkHelper.HasAttribute(methodInfo, typeof(UnitOfWorkAttribute)) ||
+                   UnitOfWorkHelper.IsRepositoryMethod(methodInfo);
         }
     }
 }

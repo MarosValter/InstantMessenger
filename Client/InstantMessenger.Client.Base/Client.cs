@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Net.Security;
 using System.Net.Sockets;
 using System.Security.Cryptography.X509Certificates;
@@ -27,6 +28,7 @@ namespace InstantMessenger.Client.Base
         public static event EventHandler Connected;
         public static event EventHandler Disconnected;
         public static event EventHandler<int> Reconnecting;
+        public static event EventHandler Reconnected;
 
         #endregion
 
@@ -132,6 +134,8 @@ namespace InstantMessenger.Client.Base
                 try
                 {
                     Connect();
+                    if (Reconnected != null)
+                        Reconnected(null, null);
                     return;
                 }
                 catch (Exception)
@@ -260,7 +264,16 @@ namespace InstantMessenger.Client.Base
 
             if (IsDisconnected)
             {
-                Connect();
+                try
+                {
+                    Connect();
+                }
+                catch (Exception)
+                {
+                    if (Disconnected != null)
+                        Disconnected(null, null);
+                    return;
+                }              
             }
 
             if (_isSending && SendWorker.IsBusy)

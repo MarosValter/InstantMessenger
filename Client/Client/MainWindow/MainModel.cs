@@ -116,5 +116,15 @@ namespace InstantMessenger.Client.MainWindow
         }
 
         #endregion
+
+        #region Event handlers
+
+        protected override void ClientOnDisconnected(object sender, EventArgs eventArgs)
+        {
+            _refreshTimer.Stop();
+            base.ClientOnDisconnected(sender, eventArgs);
+        }
+
+        #endregion
     }
 }

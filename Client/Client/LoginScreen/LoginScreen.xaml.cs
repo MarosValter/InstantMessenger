@@ -91,5 +91,10 @@ namespace InstantMessenger.Client.LoginScreen
 
             return true;
         }
+
+        private void WindowBase_Closed(object sender, System.EventArgs e)
+        {
+
+        }
     }
 }

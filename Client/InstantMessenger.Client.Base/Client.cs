@@ -17,6 +17,7 @@ namespace InstantMessenger.Client.Base
     internal enum State
     {
         Connected,
+        Connecting,
         Disconnected,
         Reconnecting,
     }
@@ -27,15 +28,16 @@ namespace InstantMessenger.Client.Base
 
         public static event EventHandler Connected;
         public static event EventHandler Disconnected;
-        public static event EventHandler<int> Reconnecting;
+        public static event EventHandler Reconnecting;
         public static event EventHandler Reconnected;
 
         #endregion
 
         #region Constants
 
-        private const int ReconnectTimeout = 3000;
-        private const int ReconnectAttempts = 3;
+        private const int ReconnectTimeout = 1000;
+        private const int MaxReconnectAttempts = 3;
+        private static int _reconnectAttempts = 0;
         //private const int Timeout = 3000000;
 
         #endregion
@@ -52,10 +54,12 @@ namespace InstantMessenger.Client.Base
         private static readonly ConcurrentDictionary<Guid, ModelBase> ModelDictionary; 
 
         private static readonly BackgroundWorker SendWorker;
-        private static readonly Queue<TransportObject> SendCache;
+        private static ConcurrentQueue<TransportObject> _sendCache;
         private static volatile bool _isSending;
 
         private static readonly BackgroundWorker ReceiveWorker;
+
+        private static readonly BackgroundWorker ConnectWorker;
 
         private static long? _myOid;
 
@@ -74,14 +78,15 @@ namespace InstantMessenger.Client.Base
 
             ModelDictionary = new ConcurrentDictionary<Guid, ModelBase>();
 
-            //SendTimer = new Timer(Timeout);
-            //SendTimer.Elapsed += SendTimerTimeout;
+            ConnectWorker = new BackgroundWorker();
+            ConnectWorker.DoWork += ConnectWorkerOnDoWork;
+            ConnectWorker.RunWorkerCompleted += ConnectWorkerOnRunWorkerCompleted;
 
             SendWorker = new BackgroundWorker();
             SendWorker.DoWork += SendWorkerDoWork;
             SendWorker.RunWorkerCompleted += SendWorkerCompleted;
 
-            SendCache = new Queue<TransportObject>();
+            _sendCache = new ConcurrentQueue<TransportObject>();
 
             ReceiveWorker = new BackgroundWorker();
             ReceiveWorker.DoWork += ReceiveWorkerDoWork;
@@ -94,58 +99,27 @@ namespace InstantMessenger.Client.Base
 
         private static void Connect()
         {
-            if (IsConnected)
-                return;
+            _client = new TcpClient(_host, _port);
+            _stream = new SslStream(_client.GetStream(), false, UserCertificateValidationCallback);
+            _stream.AuthenticateAsClient("localhost");
 
-            try
-            {
-                _client = new TcpClient(_host, _port);
-                _stream = new SslStream(_client.GetStream(), false, UserCertificateValidationCallback);
-                _stream.AuthenticateAsClient("localhost");
-
-                _connectionState = State.Connected;
-                if (!ReceiveWorker.IsBusy)
-                    ReceiveWorker.RunWorkerAsync();
-
-                if (Connected != null)
-                    Connected(null, null);
-            }
-            catch (Exception)
-            {
-                throw;
-            }
+            _connectionState = State.Connected;
+            if (!ReceiveWorker.IsBusy)
+                ReceiveWorker.RunWorkerAsync();
         }
 
         private static void Reconnect()
         {
-            if (IsReconnecting)
+            if (ConnectWorker.IsBusy)
                 return;
 
             _connectionState = State.Reconnecting;
-            var attempt = 1;
+            _reconnectAttempts = 0;
 
-            Disconnect(false);
+            ConnectWorker.RunWorkerAsync();
 
-            while (!IsConnected && attempt <= ReconnectAttempts)
-            {
-                if (Reconnecting != null)
-                    Reconnecting(null, attempt);
-
-                try
-                {
-                    Connect();
-                    if (Reconnected != null)
-                        Reconnected(null, null);
-                    return;
-                }
-                catch (Exception)
-                {
-                    ++attempt;
-                    Thread.Sleep(ReconnectTimeout);
-                }
-            }
-
-            Disconnect(true);
+            if (Reconnecting != null)
+                Reconnecting(null, null);
         }
 
         private static void Disconnect(bool fire)
@@ -163,10 +137,12 @@ namespace InstantMessenger.Client.Base
             }
 
             if (fire)
-            {
-                _connectionState = State.Disconnected;
+            {               
+                _sendCache = new ConcurrentQueue<TransportObject>();
                 if (Disconnected != null)
                     Disconnected(null, null);
+
+                _connectionState = State.Disconnected;
             }
         }
 
@@ -176,6 +152,36 @@ namespace InstantMessenger.Client.Base
         {
             _host = host;
             _port = port;
+        }
+
+        private static void ConnectWorkerOnRunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            if (e.Error == null)
+            {
+                if (Reconnected != null)
+                    Reconnected(null, null);
+
+                return;
+            }
+
+            if (_reconnectAttempts < MaxReconnectAttempts)
+            {
+                Disconnect(false);
+
+                Thread.Sleep(ReconnectTimeout);
+                ConnectWorker.RunWorkerAsync();
+            }
+            else
+            {
+                Disconnect(true);
+            }
+        }
+
+        private static void ConnectWorkerOnDoWork(object sender, DoWorkEventArgs e)
+        {
+            ++_reconnectAttempts;
+
+            Connect();
         }
 
         private static void ReceiveWorkerCompleted(object sender, RunWorkerCompletedEventArgs runWorkerCompletedEventArgs)
@@ -213,15 +219,17 @@ namespace InstantMessenger.Client.Base
             {
 
             }   
-
         }
 
         private static void SendWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            if (SendCache.Count != 0 && e.Error != null)
+            if (_sendCache.Count != 0 && IsConnected)
             {
-                var to = SendCache.Dequeue();
-                SendWorker.RunWorkerAsync(to);
+                TransportObject to;
+                _sendCache.TryDequeue(out to);
+
+                if (to != null)
+                    SendWorker.RunWorkerAsync(to);
             }
             else
             {
@@ -231,25 +239,32 @@ namespace InstantMessenger.Client.Base
 
         private static void SendWorkerDoWork(object sender, DoWorkEventArgs e)
         {
-            _isSending = true;
-
-            if (_host.IsNullOrEmpty())
-            {
-                throw new Exception("Host is not set. You must set host and port before sending request");
-            }
-
-            if (!IsConnected)
-            {
+            if (IsReconnecting)
                 return;
+
+            _isSending = true;
+            var to = e.Argument as TransportObject;
+
+            if (_myOid.HasValue)
+            {
+                to.Add("MyOid", _myOid);
             }
 
-            var to = e.Argument as TransportObject;
             try
             {
+                if (IsDisconnected)
+                {
+                    _connectionState = State.Connecting;
+                    Connect();
+                    if (Connected != null)
+                        Connected(null, null);
+                }
+                       
                 to.Serialize(_stream);
             }
             catch (Exception)
             {
+                _sendCache.Enqueue(to);
                 Reconnect();
             }
         }      
@@ -262,30 +277,12 @@ namespace InstantMessenger.Client.Base
                 ModelDictionary[modelGuid] = model;
             }
 
-            if (IsDisconnected)
+            // if worker is sending data or is busy, store data and it will handle it
+            // after its done
+            if (_isSending || SendWorker.IsBusy)
             {
-                try
-                {
-                    Connect();
-                }
-                catch (Exception)
-                {
-                    if (Disconnected != null)
-                        Disconnected(null, null);
-                    return;
-                }              
-            }
-
-            if (_isSending && SendWorker.IsBusy)
-            {
-                if (IsConnected)
-                    SendCache.Enqueue(to);
+                _sendCache.Enqueue(to);
                 return;
-            }
-
-            if (_myOid.HasValue)
-            {
-                to.Add("MyOid", _myOid);
             }
 
             SendWorker.RunWorkerAsync(to);

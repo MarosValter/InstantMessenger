@@ -14,6 +14,8 @@ namespace InstantMessenger.Client.MainWindow
     {
         #region Attributes
 
+        public event EventHandler RequestCountChanged;
+
         private readonly Timer _refreshTimer;
         private const long RefreshTime = 1000;
 
@@ -53,10 +55,20 @@ namespace InstantMessenger.Client.MainWindow
                     return;
                 _requestCount = value;
                 OnPropertyChanged("RequestCountGui");
+                if (RequestCountChanged != null)
+                    RequestCountChanged(this, null);
             }
         }
 
-        public string RequestCountGui { get { return string.Format("({0})", _requestCount); } }
+        public string RequestCountGui
+        {
+            get
+            {
+                return RequestCount > 0
+                    ? string.Format("({0})", _requestCount)
+                    : string.Empty;
+            }
+        }
 
         private string _username;
         public string Username
@@ -68,7 +80,7 @@ namespace InstantMessenger.Client.MainWindow
                     return;
                 _username = value;
                 OnPropertyChanged();
-            }
+                }
         }
 
         #endregion

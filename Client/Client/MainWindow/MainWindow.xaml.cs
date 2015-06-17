@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -18,6 +19,8 @@ namespace InstantMessenger.Client.MainWindow
         protected new MainModel Model { get { return (MainModel) base.Model; } }
         private readonly IDictionary<UserFlat, TabPanel> _openTabs;
 
+        private WindowBase _requestScreen;
+
         #endregion
 
         #region Constructor
@@ -27,6 +30,8 @@ namespace InstantMessenger.Client.MainWindow
             _openTabs = new Dictionary<UserFlat, TabPanel>();
             InitializeComponent();
             Init(new MainModel());
+
+            Model.RequestCountChanged += ModelOnRequestCountChanged;
         }
 
         #endregion
@@ -39,6 +44,14 @@ namespace InstantMessenger.Client.MainWindow
 
         #region Event handlers
 
+        private void ModelOnRequestCountChanged(object sender, EventArgs eventArgs)
+        {
+            if (_requestScreen != null)
+            {
+                _requestScreen.RefreshData();
+            }
+        }
+
         private void _btnFriends_Click(object sender, RoutedEventArgs e)
         {
             var sc = new FindScreen.FindScreen();
@@ -47,8 +60,12 @@ namespace InstantMessenger.Client.MainWindow
 
         private void _btnRequests_Click(object sender, RoutedEventArgs e)
         {
-            var sc = new RequestScreen.RequestScreen();
-            sc.ShowDialog();
+            _requestScreen = new RequestScreen.RequestScreen();
+            _requestScreen.ShowDialog();
+            _requestScreen.Closed += (o, args) =>
+            {
+                _requestScreen = null;
+            };
         }
 
         private void OnlineFriends_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)

@@ -14,6 +14,8 @@ namespace InstantMessenger.Client.Base
     {
         #region Attributes
 
+        private LoadingScreen _loadingScreen;
+
         public ModelBase Model { get; set; }
 
         public ICommand OKCommand { get; private set; }
@@ -35,6 +37,19 @@ namespace InstantMessenger.Client.Base
 
             CreateCommandBindings();           
             Client.Reconnecting += ClientOnReconnecting;
+            Client.Reconnected += ClientOnReconnected;
+            Client.Connected += ClientOnConnected;
+            Client.Disconnected += ClientOnDisconnected;
+
+            Closed += OnClosed;
+        }
+
+        protected virtual void OnClosed(object sender, EventArgs eventArgs)
+        {
+            Client.Reconnecting -= ClientOnReconnecting;
+            Client.Reconnected -= ClientOnReconnected;
+            Client.Connected -= ClientOnConnected;
+            Client.Disconnected -= ClientOnDisconnected;
         }
 
         #endregion
@@ -45,6 +60,15 @@ namespace InstantMessenger.Client.Base
             DataContext = model;
             Model.ErrorReceived += ModelOnErrorReceived;
         }
+
+        #region Public methods
+
+        public void RefreshData()
+        {
+            Model.GetInitData();
+        }
+
+        #endregion
 
         #region Commands methods
 
@@ -155,8 +179,50 @@ namespace InstantMessenger.Client.Base
             MessageBox.Show(s, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
         }
 
-        private void ClientOnReconnecting(object sender, int i)
+        private void ClientOnReconnecting(object sender, EventArgs e)
         {
+            Application.Current.Dispatcher.BeginInvoke((Action)(() =>
+            {
+                if (IsActive && IsEnabled)
+                {
+                    IsEnabled = false;
+                    _loadingScreen = new LoadingScreen("Reconnecting..");
+                    _loadingScreen.Show();
+                }
+            }));          
+        }
+
+        private void ClientOnReconnected(object sender, EventArgs eventArgs)
+        {
+            Application.Current.Dispatcher.BeginInvoke((Action)(() =>
+            {
+                IsEnabled = true;
+                if (_loadingScreen != null)
+                {
+                    _loadingScreen.Close();
+                    _loadingScreen = null;
+                }
+            }));
+
+            Model.GetInitData();
+        }
+
+        private void ClientOnDisconnected(object sender, EventArgs eventArgs)
+        {
+            Application.Current.Dispatcher.BeginInvoke((Action)(() =>
+            {
+                IsEnabled = true;
+                if (_loadingScreen != null)
+                {
+                    _loadingScreen.Close();
+                    _loadingScreen = null;
+                }
+            }));
+        }
+
+        private void ClientOnConnected(object sender, EventArgs eventArgs)
+        {
+            //throw new NotImplementedException();
         }
 
         #endregion

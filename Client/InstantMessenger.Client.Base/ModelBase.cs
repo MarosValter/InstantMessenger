@@ -21,12 +21,6 @@ namespace InstantMessenger.Client.Base
             Success = false;
             _modelGuid = Guid.NewGuid();
             Client.Disconnected += ClientOnDisconnected;
-            Client.Reconnected += ClientOnReconnected;
-        }
-
-        private void ClientOnReconnected(object sender, EventArgs eventArgs)
-        {
-            GetInitData();
         }
 
         protected virtual void ClientOnDisconnected(object sender, EventArgs eventArgs)

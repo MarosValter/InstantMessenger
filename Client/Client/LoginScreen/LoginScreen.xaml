@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:InstantMessenger.Client.LoginScreen"
         x:Class="InstantMessenger.Client.LoginScreen.LoginScreen"
         Title="{x:Static p:Resources.Login}"
-        Height="400" Width="250"
+        Height="400" Width="250" Closed="WindowBase_Closed"
     >
     <Grid Margin="0">
         <Label x:Name="_lblUsername" Content="{x:Static p:Resources.UsernameColon}" HorizontalAlignment="Left" Margin="40,123,0,0" VerticalAlignment="Top" TabIndex="0"/>

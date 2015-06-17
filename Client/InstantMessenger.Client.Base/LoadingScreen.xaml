@@ -1,0 +1,24 @@
+﻿<Window
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:LoginScreen="clr-namespace:InstantMessenger.Client.LoginScreen" x:Class="InstantMessenger.Client.Base.LoadingScreen"
+        Title="LoadingScreen" Height="80" Width="300"
+        WindowStyle="None" ResizeMode="NoResize">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="80"/>
+            <ColumnDefinition Width="220*"/>
+        </Grid.ColumnDefinitions>
+
+        <LoginScreen:CircularProgressBar HorizontalAlignment="Left" Margin="20,20,0,20" Grid.Column="0"/>
+        <TextBlock x:Name="_lblText" Margin="10" TextWrapping="Wrap" FontSize="20" TextDecorations="{x:Null}" FontWeight="Thin" FontFamily="Source Sans Pro" Grid.Column="1">
+            <TextBlock.Foreground>
+                <RadialGradientBrush>
+                    <GradientStop Color="#FF325FF9" Offset="0.26"/>
+                    <GradientStop Color="White" Offset="1"/>
+                </RadialGradientBrush>
+            </TextBlock.Foreground>
+        </TextBlock>
+
+    </Grid>
+</Window>

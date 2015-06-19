@@ -1,8 +1,10 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using InstantMessenger.Client.Base;
 using InstantMessenger.Common;
+using InstantMessenger.Common.TransportObject;
 
 namespace InstantMessenger.Client.RegisterScreen
 {
@@ -14,8 +16,6 @@ namespace InstantMessenger.Client.RegisterScreen
         #region Attributes
         public new RegisterModel Model { get { return (RegisterModel)base.Model; } }
 
-        //private Client _client;
-
         #endregion
 
         #region Constructor
@@ -24,7 +24,7 @@ namespace InstantMessenger.Client.RegisterScreen
         {
             InitializeComponent();
             Init(new RegisterModel());
-            //_client = client;
+            Model.BeforeProcessResponse += ModelOnBeforeProcessResponse;
         }
 
         #endregion
@@ -41,26 +41,12 @@ namespace InstantMessenger.Client.RegisterScreen
             Model.PasswordRepeat = (sender as PasswordBox).SecurePassword;
         }
 
-        //private void _btnOK_Click(object sender, RoutedEventArgs e)
-        //{
-        //    if (!Validate())
-        //        return;
-
-        //    var pwd = Helper.HashPassword(_txtPassword.SecurePassword);
-        //    var cred = new UserCredentials(_txtUsername.Text, pwd, _txtMail.Text);
-
-        //    _client.Connect(true);
-        //    var error = _client.Register(cred);
-
-        //    if (!string.IsNullOrEmpty(error))
-        //    {
-        //        MessageBox.Show(error, Properties.Resources.RegisterFail, MessageBoxButton.OK, MessageBoxImage.Warning);
-        //        return;
-        //    }
-
-        //    MessageBox.Show(Properties.Resources.RegisterOK, Properties.Resources.Success, MessageBoxButton.OK, MessageBoxImage.None);
-        //    Close();
-        //}
+        private void ModelOnBeforeProcessResponse(object sender, TransportObject transportObject)
+        {
+            MessageBox.Show("Successfully registered. Now you can log in.", Properties.Resources.Success,
+                MessageBoxButton.OK, MessageBoxImage.Asterisk);
+            Close();
+        }
 
         #endregion
 

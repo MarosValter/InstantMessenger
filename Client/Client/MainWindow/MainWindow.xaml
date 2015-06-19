@@ -29,7 +29,13 @@
                 <ListBox x:Name="GroupChats" ItemsSource="{Binding Path=GroupChats}" DisplayMemberPath="Name" BorderBrush="{x:Null}" Background="{x:Null}"/>
             </Expander>
         </StackPanel>
-        <TabControl x:Name="Conversations" Margin="1,0,0,2" Grid.Column="1" Grid.Row="1" Grid.RowSpan="3" Padding="0"/>
+        <TabControl x:Name="Conversations" Margin="1,0,0,2" Grid.Column="1" Grid.Row="1" Grid.RowSpan="3">
+            <!--<TabItem Style="{StaticResource TabItemStyle}" Header="12345">aaaaaaaaa</TabItem>
+            <TabItem Style="{StaticResource TabItemStyle}" Header="789asdf">bbbbb</TabItem>
+            <TabItem Style="{StaticResource TabItemStyle}" Header="bdfgdsgsdhdshsdgh">bbbbb</TabItem>
+            <TabItem Style="{StaticResource TabItemStyle}" Header="845">bbbbb</TabItem>
+            <TabItem Style="{StaticResource TabItemStyle}" Header="..">bbbbb</TabItem>-->
+        </TabControl>
         <Button x:Name="FindUsers" Content="Find users.." Background="White" Margin="0,2,1,2" Grid.Row="3" Grid.Column="0" Click="_btnFriends_Click" Foreground="#FF707070" BorderBrush="#FFACACAC"/>
         <Button x:Name="Requests" Margin="0,2,1,2" Grid.Row="2" Grid.Column="0" Background="White" Click="_btnRequests_Click" Foreground="#FF707070" BorderBrush="#FFACACAC">
             <Grid>

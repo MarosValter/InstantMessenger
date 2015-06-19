@@ -286,13 +286,17 @@ namespace InstantMessenger.Client.Base
 
             // if worker is sending data or is busy, store data and it will handle it
             // after its done
-            if (_isSending || SendWorker.IsBusy)
+            lock (SendWorker)
             {
-                _sendCache.Enqueue(to);
-                return;
+                if (_isSending || SendWorker.IsBusy)
+                {
+                    _sendCache.Enqueue(to);
+                }
+                else
+                {
+                    SendWorker.RunWorkerAsync(to);
+                }
             }
-
-            SendWorker.RunWorkerAsync(to);
         }
 
         #region Other methods

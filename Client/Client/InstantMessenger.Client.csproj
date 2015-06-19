@@ -67,6 +67,7 @@
     <SignManifests>true</SignManifests>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="PresentationFramework.Aero" />
     <Reference Include="protobuf-net">
       <HintPath>..\packages\protobuf-net.2.0.0.668\lib\net40\protobuf-net.dll</HintPath>
     </Reference>
@@ -112,9 +113,6 @@
     <Compile Include="MainWindow\MainModel.cs" />
     <Compile Include="RegisterScreen\RegisterModel.cs" />
     <Compile Include="RequestScreen\RequestModel.cs" />
-    <Compile Include="TabItem\CloseHeader.xaml.cs">
-      <DependentUpon>CloseHeader.xaml</DependentUpon>
-    </Compile>
     <Compile Include="RequestScreen\RequestScreen.xaml.cs">
       <DependentUpon>RequestScreen.xaml</DependentUpon>
     </Compile>
@@ -130,10 +128,6 @@
     <Compile Include="TabItem\ConversationModel.cs" />
     <Compile Include="TabItem\TabPanel.cs" />
     <Page Include="LoginScreen\CircularProgressBar.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="TabItem\CloseHeader.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -7,16 +7,19 @@ namespace InstantMessenger.Client.TabItem
     {
         public TabPanel(ConversationFlat conversation)
         {
-            var header = new CloseHeader(conversation.Name);
+            //var header = new CloseHeader(conversation.Name);
             var content = new Body(conversation.OID);
+            var style = this.FindResource("TabItemStyle") as Style;
+            if (style != null)
+                Style = style;
 
-            base.Header = header;
+            base.Header = conversation.Name;
             base.Content = content;
-            base.Padding = new Thickness(0);
-            base.Margin = new Thickness(0);
-            base.HorizontalContentAlignment = HorizontalAlignment.Stretch;
-            base.VerticalContentAlignment = VerticalAlignment.Stretch;
-            base.ClipToBounds = true;        
+            //base.Padding = new Thickness(0);
+            //base.Margin = new Thickness(0);
+            //base.HorizontalContentAlignment = HorizontalAlignment.Stretch;
+            //base.VerticalContentAlignment = VerticalAlignment.Stretch;
+            //base.ClipToBounds = true;        
         }
     }
 }

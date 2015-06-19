@@ -4,26 +4,20 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:base="clr-namespace:InstantMessenger.Client.Base;assembly=InstantMessenger.Client.Base"
-             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              mc:Ignorable="d" 
-             d:DesignHeight="241" d:DesignWidth="381" ClipToBounds="True">
-    <Grid Width="381" Height="241" Background="White" ClipToBounds="True">
-        <TextBox Text="{Binding Path=Text, UpdateSourceTrigger=PropertyChanged}" TextWrapping="Wrap" Height="60" VerticalAlignment="Top" TabIndex="1" Background="{x:Null}" Margin="0,181,0,0" BorderBrush="#FFA0A0A0">
+             d:DesignHeight="241" d:DesignWidth="381" ClipToBounds="True"
+             Width="381" Height="201">
+    <Grid Background="White" ClipToBounds="True">
+        <TextBox Text="{Binding Path=Text, UpdateSourceTrigger=PropertyChanged}" TextWrapping="Wrap" TabIndex="1" Background="{x:Null}" BorderBrush="#FFA0A0A0" Height="60" VerticalAlignment="Bottom">
             <TextBox.InputBindings>
                 <KeyBinding Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type base:PanelBase}}, Path=OKCommand}" Key="Return"/>
             </TextBox.InputBindings>
         </TextBox>
-        <ScrollViewer ScrollChanged="ScrollViewer_OnScrollChanged" Margin="0,5,0,65" TabIndex="0" VerticalScrollBarVisibility="Auto" BorderBrush="#FFA0A0A0" BorderThickness="1">
-            <!--<i:EventTrigger EventName="ScrollChanged">
-
-                <i:InvokeCommandAction Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type base:PanelBase}}, Path=RequestCommand}" CommandParameter="LoadNextMessages"/>
-
-            </i:EventTrigger>-->
+        <ScrollViewer ScrollChanged="ScrollViewer_OnScrollChanged" Margin="0,0,0,65" TabIndex="0" VerticalScrollBarVisibility="Auto" BorderBrush="#FFA0A0A0" BorderThickness="1">
             <ListBox ItemsSource="{Binding Path=Messages}" DisplayMemberPath="Text"/>
-
         </ScrollViewer>
         <Border BorderBrush="Red" BorderThickness="2">
-            
+
         </Border>
     </Grid>
 </base:PanelBase>

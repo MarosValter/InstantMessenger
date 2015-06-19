@@ -90,7 +90,7 @@ namespace InstantMessenger.DataModel.DataManagers
 
             ObjectFactory.GetInstance<BROMessages>().Create(bdo);
 
-            var dto = new TransportObject(Protocol.MessageType.IM_OK);
+            var dto = new TransportObject(Protocol.MessageType.IM_DONT_SEND);
             return dto;
         }
     }

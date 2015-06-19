@@ -32,7 +32,11 @@ namespace InstantMessenger.Core.IoC
                 Classes.FromAssembly(DataModelAssembly).BasedOn<DataManagerBase>()
                                                        .WithService.DefaultInterfaces()
                                                        .WithService.Self()
+                                                       .LifestyleSingleton(),
+                Classes.FromAssembly(DataModelAssembly).BasedOn<IBFO>()
                                                        .LifestyleSingleton()
+                                                       .WithServiceDefaultInterfaces()
+                                                       .WithServiceSelf()
             );
         }
 

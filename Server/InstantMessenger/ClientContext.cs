@@ -12,6 +12,8 @@ namespace InstantMessenger.Server
 {
     public class ClientContext : IDisposable
     {
+        private bool _disposed;
+
         public event EventHandler LoggedIn;
         public event EventHandler Disposed;
 
@@ -84,7 +86,6 @@ namespace InstantMessenger.Server
             switch (to.Type)
             {
                 case Protocol.MessageType.IM_Login:
-
                     result = ObjectFactory.GetInstance<UsersDataManager>().LoginUser(to);
                     if (result.Type == Protocol.MessageType.IM_OK)
                     {
@@ -93,8 +94,17 @@ namespace InstantMessenger.Server
                             LoggedIn(this, null);
                     }
                     break;
-                case Protocol.MessageType.IM_FriendsRequests:
+                case Protocol.MessageType.IM_InitMain:
                     result = ObjectFactory.GetInstance<UsersDataManager>().MainWindowInit(to);
+                    break;
+                case Protocol.MessageType.IM_InitConversation:
+                    result = ObjectFactory.GetInstance<ConversationsDataManager>().Init(to);
+                    break;
+                case Protocol.MessageType.IM_GetOldMessages:
+                    result = ObjectFactory.GetInstance<ConversationsDataManager>().GetOldMessages(to);
+                    break;
+                case Protocol.MessageType.IM_Send:
+                    result = ObjectFactory.GetInstance<ConversationsDataManager>().SendMessage(to);
                     break;
                 case Protocol.MessageType.IM_Register:
                     result = ObjectFactory.GetInstance<UsersDataManager>().Register(to);
@@ -108,7 +118,7 @@ namespace InstantMessenger.Server
                 case Protocol.MessageType.IM_Add:
                     result = ObjectFactory.GetInstance<FriendshipsDataManager>().SendRequest(to);
                     break;
-                case Protocol.MessageType.IM_Accept:
+                case Protocol.MessageType.IM_AcceptRequest:
                     result = ObjectFactory.GetInstance<FriendshipsDataManager>().AcceptRequest(to);
                     break;
                 case Protocol.MessageType.IM_DeleteRequest:
@@ -121,15 +131,34 @@ namespace InstantMessenger.Server
             result.Serialize(Stream);
         }
 
+        #region IDisposable
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposed)
+            {
+                if (disposing)
+                {
+                    //dispose managed resources
+                    Socket.Client.Close();
+                    Socket.Close();
+                    Stream.Close();
+                    Stream.Dispose();
+
+                    if (Disposed != null)
+                        Disposed(this, null);
+                }
+            }
+            //dispose unmanaged resources
+            _disposed = true;
+        }
+
         public void Dispose()
         {
-            Socket.Client.Close();
-            Socket.Close();
-            Stream.Close();
-            Stream.Dispose();
-
-            if (Disposed != null)
-                Disposed(this, null);
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
+
+        #endregion
     }
 }

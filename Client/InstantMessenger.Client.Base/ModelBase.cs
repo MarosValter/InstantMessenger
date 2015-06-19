@@ -29,7 +29,7 @@ namespace InstantMessenger.Client.Base
                 ErrorReceived(this, "Server is unavailable.");
         }
 
-        public virtual void OKACtion()
+        public virtual void OKAction()
         {
             var to = new TransportObject();
             CreateRequest(to);
@@ -40,8 +40,6 @@ namespace InstantMessenger.Client.Base
         {
             var to = new TransportObject();
             action(to);
-            if (to == null)
-                return;
             SendRequest(to);
         }
 

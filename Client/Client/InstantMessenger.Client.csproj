@@ -127,6 +127,7 @@
     <Compile Include="TabItem\Body.xaml.cs">
       <DependentUpon>Body.xaml</DependentUpon>
     </Compile>
+    <Compile Include="TabItem\ConversationModel.cs" />
     <Compile Include="TabItem\TabPanel.cs" />
     <Page Include="LoginScreen\CircularProgressBar.xaml">
       <SubType>Designer</SubType>

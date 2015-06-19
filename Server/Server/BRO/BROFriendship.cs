@@ -8,11 +8,6 @@ namespace InstantMessenger.DataModel.BRO
 {
     public class BROFriendship : BROGeneric<BDOFriendship>
     {
-        public BROFriendship(IRepository<BDOFriendship> repository)
-            : base(repository)
-        { }
-
-
         public bool AlreadyRequested(BDOUser sender, BDOUser recipient)
         {
             return Repository.Count(x => x.User == sender && x.Friend == recipient) > 0;

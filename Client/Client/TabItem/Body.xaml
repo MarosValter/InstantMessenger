@@ -1,15 +1,29 @@
-﻿<UserControl x:Class="InstantMessenger.Client.TabItem.Body"
+﻿<base:PanelBase x:Class="InstantMessenger.Client.TabItem.Body"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:base="clr-namespace:InstantMessenger.Client.Base;assembly=InstantMessenger.Client.Base"
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              mc:Ignorable="d" 
              d:DesignHeight="241" d:DesignWidth="381" ClipToBounds="True">
     <Grid Width="381" Height="241" Background="White" ClipToBounds="True">
-        <TextBox TextWrapping="Wrap" Height="60" VerticalAlignment="Top" TabIndex="1" Background="{x:Null}" Margin="0,181,0,0" BorderBrush="#FFA0A0A0"/>
-        <ScrollViewer Margin="0,5,0,65" TabIndex="0" VerticalScrollBarVisibility="Auto" BorderBrush="#FFA0A0A0" BorderThickness="1">
-            <StackPanel/>
+        <TextBox Text="{Binding Path=Text, UpdateSourceTrigger=PropertyChanged}" TextWrapping="Wrap" Height="60" VerticalAlignment="Top" TabIndex="1" Background="{x:Null}" Margin="0,181,0,0" BorderBrush="#FFA0A0A0">
+            <TextBox.InputBindings>
+                <KeyBinding Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type base:PanelBase}}, Path=OKCommand}" Key="Return"/>
+            </TextBox.InputBindings>
+        </TextBox>
+        <ScrollViewer ScrollChanged="ScrollViewer_OnScrollChanged" Margin="0,5,0,65" TabIndex="0" VerticalScrollBarVisibility="Auto" BorderBrush="#FFA0A0A0" BorderThickness="1">
+            <!--<i:EventTrigger EventName="ScrollChanged">
+
+                <i:InvokeCommandAction Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type base:PanelBase}}, Path=RequestCommand}" CommandParameter="LoadNextMessages"/>
+
+            </i:EventTrigger>-->
+            <ListBox ItemsSource="{Binding Path=Messages}" DisplayMemberPath="Text"/>
+
         </ScrollViewer>
-        <Border BorderBrush="Red" BorderThickness="2"/>
+        <Border BorderBrush="Red" BorderThickness="2">
+            
+        </Border>
     </Grid>
-</UserControl>
+</base:PanelBase>

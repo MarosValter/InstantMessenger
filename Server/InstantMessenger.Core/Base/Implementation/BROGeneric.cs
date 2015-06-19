@@ -8,9 +8,9 @@ namespace InstantMessenger.Core.Base.Implementation
     {
         protected readonly IRepository<TBDO> Repository;
 
-        protected BROGeneric(IRepository<TBDO> repository)
+        protected BROGeneric()
         {
-            Repository = repository;
+            Repository = ObjectFactory.GetInstance<IRepository<TBDO>>();
         }
 
         public IList<TBDO> GetAll()

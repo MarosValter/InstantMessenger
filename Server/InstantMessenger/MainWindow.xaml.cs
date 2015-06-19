@@ -16,13 +16,13 @@ namespace InstantMessenger.Server
 
             _server = new Server(cert, port);
             Grid.ItemsSource = _server.Clients;
-            _server.ClientsChanged += ServerOnClientsChanged;
+            //_server.ClientsChanged += ServerOnClientsChanged;
         }
 
-        private void ServerOnClientsChanged(object sender, ClientEventArgs clientEventArgs)
-        {
-            Grid.Dispatcher.Invoke(Grid.Items.Refresh);
-        }
+        //private void ServerOnClientsChanged(object sender, ClientEventArgs clientEventArgs)
+        //{
+        //    Grid.Dispatcher.Invoke(Grid.Items.Refresh);
+        //}
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {

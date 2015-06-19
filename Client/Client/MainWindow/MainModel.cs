@@ -19,8 +19,8 @@ namespace InstantMessenger.Client.MainWindow
         private readonly Timer _refreshTimer;
         private const long RefreshTime = 1000;
 
-        private ObservableCollection<UserFlat> _onlineFriends;
-        public ObservableCollection<UserFlat> OnlineFriends
+        private ObservableCollection<ConversationFlat> _onlineFriends;
+        public ObservableCollection<ConversationFlat> OnlineFriends
         {
             get {return _onlineFriends;}
             set
@@ -32,8 +32,8 @@ namespace InstantMessenger.Client.MainWindow
             }
         }
 
-        private ObservableCollection<UserFlat> _offlineFriends;
-        public ObservableCollection<UserFlat> OfflineFriends
+        private ObservableCollection<ConversationFlat> _offlineFriends;
+        public ObservableCollection<ConversationFlat> OfflineFriends
         {
             get { return _offlineFriends; }
             set
@@ -41,6 +41,19 @@ namespace InstantMessenger.Client.MainWindow
                 if (_offlineFriends == value)
                     return;
                 _offlineFriends = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private ObservableCollection<ConversationFlat> _groupChats;
+        public ObservableCollection<ConversationFlat> GroupChats
+        {
+            get { return _groupChats; }
+            set
+            {
+                if (_groupChats == value)
+                    return;
+                _groupChats = value;
                 OnPropertyChanged();
             }
         }
@@ -89,8 +102,9 @@ namespace InstantMessenger.Client.MainWindow
 
         public MainModel()
         {
-            OnlineFriends = new ObservableCollection<UserFlat>();
-            OfflineFriends = new ObservableCollection<UserFlat>();
+            OnlineFriends = new ObservableCollection<ConversationFlat>();
+            OfflineFriends = new ObservableCollection<ConversationFlat>();
+            GroupChats = new ObservableCollection<ConversationFlat>();
 
             _refreshTimer = new Timer(RefreshTime);
             _refreshTimer.AutoReset = true;
@@ -101,23 +115,31 @@ namespace InstantMessenger.Client.MainWindow
 
         #region Overrides
 
+        // Must be empty, otherwise Enter key press would call CreateRequest and then throw exception
+        // that TransportObject doesn't have Type.
+        public override void OKAction()
+        {
+        }
+
         protected override void CreateRequest(TransportObject to)
         {
         }
 
         protected override void CreateInitRequest(TransportObject to)
         {
-            to.Type = Protocol.MessageType.IM_FriendsRequests;
+            to.Type = Protocol.MessageType.IM_InitMain;
         }
 
         protected override void ProcessResponse(TransportObject to)
         {
-            var friends = to.Get<List<UserFlat>>("Friends");
             var requestCount = to.Get<int>("RequestCount");
             var flat = to.Get<UserFlat>("UserFlat");
+            var conversations = to.Get<List<ConversationFlat>>("Conversations");
 
-            OnlineFriends = new ObservableCollection<UserFlat>(friends.Where(x => x.IsOnline));
-            OfflineFriends = new ObservableCollection<UserFlat>(friends.Where(x => !x.IsOnline));
+            OnlineFriends = new ObservableCollection<ConversationFlat>(conversations.Where(x => x.IsDialog && x.IsUserOnline.Value));
+            OfflineFriends = new ObservableCollection<ConversationFlat>(conversations.Where(x => x.IsDialog && !x.IsUserOnline.Value));
+            GroupChats = new ObservableCollection<ConversationFlat>(conversations.Where(x => !x.IsDialog));
+
             RequestCount = requestCount;
             Username = flat.Username;
 

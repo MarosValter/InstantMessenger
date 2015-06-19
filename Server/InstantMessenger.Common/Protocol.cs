@@ -14,20 +14,23 @@ namespace InstantMessenger.Common
             IM_Login,           // Login
             IM_Register,        // Register
             IM_Add,             // Add friend
-            IM_Accept,          // Accept friend request
+            
             IM_Find,            // Find user
-            IM_Exists,          // Already exists
-            IM_IsAvailable,     // Is user available?
-            IM_Available,       // User is available or not
             IM_Send,            // Send message
             IM_Received,        // Message received
-            IM_FriendsRequests, // Get friends and requests after login
+            IM_InitMain,        // Init main window with friends and conversations
+            IM_InitConversation,// Init conversation with messages
+            IM_GetOldMessages,  // Get next batch of messages
             IM_GetRequests,     // Get friendship requests
+            IM_AcceptRequest,   // Accept friend request
             IM_DeleteRequest,   // Delete friendship request
 
             //Response
             IM_OK,              // OK
             IM_ERROR,           // Error
+
+            //Special
+            IM_DONT_SEND        // Special case, when don't want the TransportObject being sent
         }
     }
 }

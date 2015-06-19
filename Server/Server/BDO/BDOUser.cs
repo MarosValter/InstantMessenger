@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using InstantMessenger.Core.Base.Implementation;
 
 namespace InstantMessenger.DataModel.BDO
@@ -17,6 +18,7 @@ namespace InstantMessenger.DataModel.BDO
             Map(x => x.Email).Column("T01Email").Nullable();
 
             HasMany(x => x.Messages).KeyColumn("T01FromUserOID").Inverse().BatchSize(50);
+            HasMany(x => x.ConversationUsers).KeyColumn("T01UserOID").Inverse();
         }
     }
 
@@ -34,7 +36,14 @@ namespace InstantMessenger.DataModel.BDO
 
         public virtual string Email { get; set; }
 
-        public virtual IList<BDOMessage> Messages { get; set; } 
+        public virtual IList<BDOMessage> Messages { get; set; }
+
+        public virtual IList<BDOConversation_Users> ConversationUsers { get; set; }
+
+        public virtual IList<BDOConversation> GetConversations
+        {
+            get { return ConversationUsers.Select(x => x.Conversation).ToList(); }
+        }
     }
 }
 

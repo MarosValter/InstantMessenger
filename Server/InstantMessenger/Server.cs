@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Net;
 using System.Net.Security;
 using System.Net.Sockets;
 using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
+using System.Windows.Data;
 using InstantMessenger.Core;
 using InstantMessenger.DataModel.BRO;
 using InstantMessenger.DataModel.DataManagers;
@@ -22,12 +24,12 @@ namespace InstantMessenger.Server
 
         #region Attributes
 
+        private bool _disposed;
+
         private readonly TcpListener _server;
         private readonly X509Certificate _cert;
 
-        private bool _continueTransmission = false;
-
-        public ISet<ClientContext> Clients { get; private set; }
+        public ObservableCollection<ClientContext> Clients { get; private set; }
 
         private readonly object _lock = new object();
 
@@ -37,7 +39,9 @@ namespace InstantMessenger.Server
 
         public Server(X509Certificate cert, int port)
         {
-            Clients = new HashSet<ClientContext>();
+            Clients = new ObservableCollection<ClientContext>();
+            BindingOperations.EnableCollectionSynchronization(Clients, _lock);
+
             _cert = cert;
             _server = new TcpListener(IPAddress.Any, port);
             ObjectFactory.GetInstance<BROUsers>().LogoutAllUsers();
@@ -106,22 +110,11 @@ namespace InstantMessenger.Server
             var ssl = new SslStream(stream, false);
             var user = new ClientContext(client, ssl);
             user.Disposed += UserOnDisposed;
-            user.LoggedIn += UserOnLoggedIn;
 
             try
             {              
-                ssl.AuthenticateAsServer(_cert, false, SslProtocols.Tls, false);
-                
-                ClientEventArgs args;
-
-                lock (_lock)
-                {
-                    Clients.Add(user);
-                    args = new ClientEventArgs(Clients);
-                }
-
-                if (ClientsChanged != null)
-                    ClientsChanged(this, args);
+                ssl.AuthenticateAsServer(_cert, false, SslProtocols.Tls, false);               
+                Clients.Add(user);
 
                 user.Read();
             }
@@ -131,32 +124,11 @@ namespace InstantMessenger.Server
             }
         }
 
-        private void UserOnLoggedIn(object sender, EventArgs eventArgs)
-        {
-            ClientEventArgs args;
-            lock (_lock)
-            {
-                args = new ClientEventArgs(Clients);
-            }
-
-            if (ClientsChanged != null)
-                ClientsChanged(this, args);
-        }
-
         private void UserOnDisposed(object sender, EventArgs e)
         {
             var user = sender as ClientContext;
 
-            ClientEventArgs args;
-
-            lock (_lock)
-            {
-                Clients.Remove(user);
-                args = new ClientEventArgs(Clients);
-            }
-
-            if (ClientsChanged != null)
-                ClientsChanged(this, args);
+            Clients.Remove(user);
 
             if (user.User != null)
             {
@@ -166,15 +138,32 @@ namespace InstantMessenger.Server
 
         #endregion
 
-        #region IDisposable member
+        #region IDisposable
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposed)
+            {
+                if (disposing)
+                {
+                    //dispose managed resources
+                    _server.Stop();
+                    var clients = Clients;
+                    foreach (var client in clients)
+                    {
+                        client.Dispose();
+                    }
+                    clients.Clear();
+                }
+            }
+            //dispose unmanaged resources
+            _disposed = true;
+        }
 
         public void Dispose()
         {
-            _server.Stop();
-            foreach (var client in Clients)
-            {
-                client.Dispose();
-            }
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
         #endregion

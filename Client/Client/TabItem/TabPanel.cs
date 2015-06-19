@@ -5,10 +5,10 @@ namespace InstantMessenger.Client.TabItem
 {
     public class TabPanel : System.Windows.Controls.TabItem
     {
-        public TabPanel(UserFlat user)
+        public TabPanel(ConversationFlat conversation)
         {
-            var header = new CloseHeader(user.Username);
-            var content = new Body();
+            var header = new CloseHeader(conversation.Name);
+            var content = new Body(conversation.OID);
 
             base.Header = header;
             base.Content = content;

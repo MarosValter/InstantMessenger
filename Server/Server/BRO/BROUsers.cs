@@ -16,10 +16,6 @@ namespace InstantMessenger.DataModel.BRO
 
         #endregion
 
-        public BROUsers(IRepository<BDOUser> repository)
-            : base(repository)
-        { }
-
         public BDOUser GetUserByUsername(string username)
         {
             return Repository.FindOne(x => x.Username == username);

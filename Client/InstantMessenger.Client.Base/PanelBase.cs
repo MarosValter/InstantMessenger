@@ -1,44 +1,30 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
-using InstantMessenger.Common;
 using InstantMessenger.Common.TransportObject;
 
 namespace InstantMessenger.Client.Base
 {
-    public class WindowBase : Window//, IDisposable
+    public class PanelBase : UserControl//, IDisposable
     {
         #region Attributes
 
-        //private bool _disposed ;
+        //private bool _disposed;
         private LoadingScreen _loadingScreen;
 
         public ModelBase Model { get; set; }
 
         public ICommand OKCommand { get; private set; }
-        public ICommand CancelCommand { get; private set; }
         public ICommand RequestCommand { get; private set; }
 
         #endregion
 
         #region Constructor
 
-        public WindowBase(bool acceptEnter = true)
+        public PanelBase()
         {
-            var okInputs = new InputGestureCollection();
-            if (acceptEnter)
-            {
-                okInputs.Add(new KeyGesture(Key.Enter));
-            }
-            OKCommand = new RoutedUICommand("OK", "OK", typeof(WindowBase), okInputs);
-            CancelCommand = new RoutedUICommand("Cancel", "Cancel", typeof(WindowBase), new InputGestureCollection
-            {
-                new KeyGesture(Key.Escape),
-            });
+            OKCommand = new RoutedUICommand("OK", "OK", typeof(WindowBase));
             RequestCommand = new RoutedUICommand("Request", "Request", typeof(WindowBase));
 
             CreateCommandBindings();           
@@ -46,11 +32,11 @@ namespace InstantMessenger.Client.Base
             Client.Reconnected += ClientOnReconnected;
             Client.Connected += ClientOnConnected;
             Client.Disconnected += ClientOnDisconnected;
-
-            Closed += OnClosed;
+            
+            Unloaded += OnUnloaded;
         }
 
-        protected virtual void OnClosed(object sender, EventArgs eventArgs)
+        protected virtual void OnUnloaded(object sender, EventArgs eventArgs)
         {
             Client.Reconnecting -= ClientOnReconnecting;
             Client.Reconnected -= ClientOnReconnected;
@@ -81,7 +67,6 @@ namespace InstantMessenger.Client.Base
         private void CreateCommandBindings()
         {
             CommandBindings.Add(new CommandBinding(OKCommand, OKCommand_Executed, OKCommand_CanExecute));
-            CommandBindings.Add(new CommandBinding(CancelCommand, CancelCommand_Executed, CancelCommand_CanExecute));
             CommandBindings.Add(new CommandBinding(RequestCommand, RequestCommand_Executed, RequestCommand_CanExecute));
         }
 
@@ -112,33 +97,6 @@ namespace InstantMessenger.Client.Base
         private void OKCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             e.CanExecute = CanExecuteOK();
-        }
-
-        #endregion
-
-        #region Cancel
-
-        /// <summary>
-        /// Default Cancel button action. Closes the window.
-        /// </summary>
-        protected virtual void CancelButtonAction()
-        {
-            Close();
-        }
-
-        protected virtual bool CanExecuteCancel()
-        {
-            return true;
-        }
-
-        private void CancelCommand_Executed(object sender, ExecutedRoutedEventArgs e)
-        {
-            CancelButtonAction();
-        }
-
-        private void CancelCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
-        {
-            e.CanExecute = CanExecuteCancel();
         }
 
         #endregion
@@ -189,10 +147,10 @@ namespace InstantMessenger.Client.Base
         {
             Application.Current.Dispatcher.BeginInvoke((Action)(() =>
             {
-                if (IsActive && IsEnabled)
+                if (IsEnabled)
                 {
                     IsEnabled = false;
-                    _loadingScreen = new LoadingScreen(this, "Reconnecting..");
+                    _loadingScreen = new LoadingScreen(Application.Current.MainWindow, "Reconnecting..");
                     _loadingScreen.Show();
                 }
             }));          
@@ -242,8 +200,7 @@ namespace InstantMessenger.Client.Base
         //        if (disposing)
         //        {
         //            //dispose managed resources
-        //            if (_loadingScreen != null)
-        //                _loadingScreen.Close();
+        //            _loadingScreen.Dispose();
         //        }
         //    }
         //    //dispose unmanaged resources

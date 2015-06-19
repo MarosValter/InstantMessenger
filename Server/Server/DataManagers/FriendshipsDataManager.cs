@@ -7,6 +7,7 @@ using InstantMessenger.Core;
 using InstantMessenger.Core.Base.Implementation;
 using InstantMessenger.Core.UOW;
 using InstantMessenger.DataModel.BDO;
+using InstantMessenger.DataModel.BFO;
 using InstantMessenger.DataModel.BRO;
 
 namespace InstantMessenger.DataModel.DataManagers
@@ -88,16 +89,21 @@ namespace InstantMessenger.DataModel.DataManagers
             }
 
             var request = ObjectFactory.GetInstance<BROFriendship>().GetBySendeRecipient(sender, recipient);
-            var result = ObjectFactory.GetInstance<BROFriendship>().AcceptRequest(request);
-                
-            if (result)
+            var accepted = ObjectFactory.GetInstance<BROFriendship>().AcceptRequest(request);
+
+            var dialogCreated = ObjectFactory.GetInstance<BFOConversations>().CreateDialog(userOid, myOid);
+
+            if (accepted && dialogCreated)
             {
                 dto.Type = Protocol.MessageType.IM_OK;
             }
             else
             {
+                var msg = accepted
+                    ? "Unable to create conversation after accepting "
+                    : "Unable to accept request.";
                 dto.Type = Protocol.MessageType.IM_ERROR;
-                dto.Add("Error", "Unable to accept request.");
+                dto.Add("Error", msg);
                 return dto;
             }
 

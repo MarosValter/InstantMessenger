@@ -20,6 +20,9 @@ namespace InstantMessenger.Common.TransportObject
             {5, typeof (int)},
             {6, typeof (RequestFlat)},
             {7, typeof (Guid)},
+            {8, typeof(ConversationFlat)},
+            {9, typeof(MessageFlat)},
+            {10, typeof (bool)},
             {30, typeof(List<>)},
         };
 
@@ -66,7 +69,8 @@ namespace InstantMessenger.Common.TransportObject
 
         public void Add(string key, object value)
         {
-            _dict.Add(key, value);
+            if (!_dict.ContainsKey(key))
+                _dict.Add(key, value);
         }
 
         public T Get<T>(string key)
@@ -85,20 +89,27 @@ namespace InstantMessenger.Common.TransportObject
                 
             }
 
-            Serializer.SerializeWithLengthPrefix(stream, Type, PrefixStyle.Base128);
-            Serializer.SerializeWithLengthPrefix(stream, _dict.Count(x => x.Value != null), PrefixStyle.Base128);
+            if (Type == Protocol.MessageType.IM_DONT_SEND)
+                return;
 
-            foreach (var item in _dict)
+            lock (stream)
             {
-                // we cant send null objects, but Get will yield null, if object was not sent
-                if (item.Value == null)
-                    continue;
+                Serializer.SerializeWithLengthPrefix(stream, Type, PrefixStyle.Base128);
+                Serializer.SerializeWithLengthPrefix(stream, _dict.Count(x => x.Value != null), PrefixStyle.Base128);
 
-                Serializer.SerializeWithLengthPrefix(stream, item.Key, PrefixStyle.Base128);
-                Serializer.NonGeneric.SerializeWithLengthPrefix(stream, item.Value, PrefixStyle.Base128, GetNumByType(item.Value.GetType()));
+                foreach (var item in _dict)
+                {
+                    // we cant send null objects, but Get will yield null, if object was not sent
+                    if (item.Value == null)
+                        continue;
+
+                    Serializer.SerializeWithLengthPrefix(stream, item.Key, PrefixStyle.Base128);
+                    Serializer.NonGeneric.SerializeWithLengthPrefix(stream, item.Value, PrefixStyle.Base128,
+                        GetNumByType(item.Value.GetType()));
+                }
+
+                stream.Flush();
             }
-           
-            stream.Flush();
         }
 
         public static TransportObject Deserialize(SslStream stream)

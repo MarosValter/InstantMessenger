@@ -79,6 +79,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Base\IBDO.cs" />
+    <Compile Include="Base\IBFO.cs" />
     <Compile Include="Base\IDataManager.cs" />
     <Compile Include="Base\Implementation\BDOBase.cs" />
     <Compile Include="Base\Implementation\BROGeneric.cs" />

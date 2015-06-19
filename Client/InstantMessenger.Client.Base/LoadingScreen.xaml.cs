@@ -19,9 +19,10 @@ namespace InstantMessenger.Client.Base
     /// </summary>
     public partial class LoadingScreen : Window
     {
-        public LoadingScreen(string text)
+        public LoadingScreen(Window owner, string text)
         {
             InitializeComponent();
+            Owner = owner;
             _lblText.TextAlignment = TextAlignment.Center;
             _lblText.Text = text;
 

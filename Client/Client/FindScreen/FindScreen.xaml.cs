@@ -17,5 +17,10 @@ namespace InstantMessenger.Client.FindScreen
             InitializeComponent();
             Init(new FindModel());
         }
+
+        protected override bool Validate()
+        {
+            return _grid.SelectedIndex != -1;
+        }
     }
 }

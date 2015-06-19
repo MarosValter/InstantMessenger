@@ -196,6 +196,9 @@ namespace InstantMessenger.Client.Base
                 while (IsConnected)
                 {
                     var to = TransportObject.Deserialize(_stream);
+                    if (to == null)
+                        continue;
+
                     var modelGuid = to.Get<Guid>("ModelGuid");
                     var flat = to.Get<UserFlat>("UserFlat");
 
@@ -259,8 +262,12 @@ namespace InstantMessenger.Client.Base
                     if (Connected != null)
                         Connected(null, null);
                 }
-                       
+
                 to.Serialize(_stream);
+            }
+            catch (SerializationException)
+            {
+                throw;
             }
             catch (Exception)
             {

@@ -3,7 +3,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:LoginScreen="clr-namespace:InstantMessenger.Client.LoginScreen" x:Class="InstantMessenger.Client.Base.LoadingScreen"
         Title="LoadingScreen" Height="80" Width="300"
-        WindowStyle="None" ResizeMode="NoResize">
+        WindowStyle="None" ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="80"/>

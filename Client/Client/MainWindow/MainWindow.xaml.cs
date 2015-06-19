@@ -17,7 +17,7 @@ namespace InstantMessenger.Client.MainWindow
     {
         #region Attributes
         protected new MainModel Model { get { return (MainModel) base.Model; } }
-        private readonly IDictionary<UserFlat, TabPanel> _openTabs;
+        private readonly IDictionary<ConversationFlat, TabPanel> _openTabs;
 
         private WindowBase _requestScreen;
 
@@ -26,8 +26,9 @@ namespace InstantMessenger.Client.MainWindow
         #region Constructor
 
         public MainWindow()
+            //:base(false)
         {
-            _openTabs = new Dictionary<UserFlat, TabPanel>();
+            _openTabs = new Dictionary<ConversationFlat, TabPanel>();
             InitializeComponent();
             Init(new MainModel());
 
@@ -70,20 +71,20 @@ namespace InstantMessenger.Client.MainWindow
 
         private void OnlineFriends_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            var user = (sender as ListBox).SelectedItem as UserFlat;
-            if (user == null)
+            var conversation = (sender as ListBox).SelectedItem as ConversationFlat;
+            if (conversation == null)
             {
                 return;
             }
 
-            if (ActiveConversation(user))
+            if (ActiveConversation(conversation))
             {
-                _openTabs[user].Focus();
+                _openTabs[conversation].Focus();
                 return;
             }
 
-            var tab = new TabPanel(user);
-            _openTabs[user] = tab;
+            var tab = new TabPanel(conversation);
+            _openTabs[conversation] = tab;
             Conversations.Items.Add(tab);
             tab.Focus();
 
@@ -93,9 +94,9 @@ namespace InstantMessenger.Client.MainWindow
 
         #region Other methods
 
-        private bool ActiveConversation(UserFlat user)
+        private bool ActiveConversation(ConversationFlat conversation)
         {
-            return _openTabs.ContainsKey(user);
+            return _openTabs.ContainsKey(conversation);
         }
 
         #endregion

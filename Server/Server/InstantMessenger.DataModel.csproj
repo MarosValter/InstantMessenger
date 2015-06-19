@@ -58,8 +58,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BDO\BDOConversation.cs" />
+    <Compile Include="BDO\BDOConversation_Users.cs" />
+    <Compile Include="BFO\BFOConversations.cs" />
+    <Compile Include="BRO\BROConversations.cs" />
+    <Compile Include="BRO\BROConversation_Users.cs" />
     <Compile Include="BRO\BROFriendship.cs" />
+    <Compile Include="BRO\BROMessages.cs" />
     <Compile Include="BRO\BROUsers.cs" />
+    <Compile Include="DataManagers\ConversationsDataManager.cs" />
     <Compile Include="DataManagers\FriendshipsDataManager.cs" />
     <Compile Include="DataManagers\MessagesDataManager.cs" />
     <Compile Include="DataManagers\UsersDataManager.cs" />

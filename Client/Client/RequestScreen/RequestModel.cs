@@ -44,7 +44,7 @@ namespace InstantMessenger.Client.RequestScreen
         }
         protected override void CreateRequest(TransportObject to)
         {
-            to.Type = Protocol.MessageType.IM_Accept;
+            to.Type = Protocol.MessageType.IM_AcceptRequest;
             to.Add("UserOid", SelectedUserOid);
         }
 

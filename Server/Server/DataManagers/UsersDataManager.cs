@@ -20,7 +20,22 @@ namespace InstantMessenger.DataModel.DataManagers
             mapper.CreateMap<BDOUser, UserFlat>();
             mapper.CreateMap<BDOFriendship, UserFlat>()
                   .ConstructProjectionUsing(src => Mapper.Map<BDOUser, UserFlat>(src.Friend));
+            mapper.CreateMap<BDOConversation, ConversationFlat>();
+            //.ConstructUsing(MapConversation);
+            //.ForMember(dest => dest.Name, opt => opt.MapFrom(src => string.Join(", ", src.GetUsers.Select(x => x.Username))));
         }
+
+        //private ConversationFlat MapConversation(BDOConversation bdoConversation)
+        //{
+        //    var flat = new ConversationFlat();
+        //    flat.OID = bdoConversation.OID;
+        //    flat.IsDialog = bdoConversation.IsDialog;
+
+        //    var users = bdoConversation.GetUsers;
+        //    flat.Name = string.Join(", ", users.Select(x => x.Username));
+        //    flat.IsUserOnline = bdoConversation.IsDialog
+        //                            ? users.First(x => x.)
+        //}
 
         public TransportObject LoginUser(TransportObject to)
         {
@@ -105,15 +120,30 @@ namespace InstantMessenger.DataModel.DataManagers
         public virtual TransportObject MainWindowInit(TransportObject to)
         {
             var myOid = to.Get<long>("MyOid");
-            var friends = ObjectFactory.GetInstance<BROFriendship>().GetFriendsByUser(myOid);
+            //var friends = ObjectFactory.GetInstance<BROFriendship>().GetFriendsByUser(myOid);
             var requestCount = ObjectFactory.GetInstance<BROFriendship>().GetUserRequestCount(myOid);
             var user = ObjectFactory.GetInstance<BROUsers>().GetByOid(myOid);
 
-            var friendFlats = Mapper.Map<IList<BDOFriendship>, IList<UserFlat>>(friends);
+            var conversations = user.GetConversations;
+            var conversationFlats = Mapper.Map<IList<BDOConversation>, IList<ConversationFlat>>(conversations);
+
+            foreach (var item in conversationFlats)
+            {
+                var bdo = conversations.First(x => x.OID == item.OID);
+                var users = bdo.GetUsers;
+
+                item.IsUserOnline = item.IsDialog
+                    ? users.First(x => x.OID != myOid).IsOnline
+                    : (bool?)null;
+                item.Name = string.Join(", ", users.Where(x => x.OID != myOid).Select(x => x.Username));
+            }
+
+            //var friendFlats = Mapper.Map<IList<BDOFriendship>, IList<UserFlat>>(friends);
             var flat = Mapper.Map<BDOUser, UserFlat>(user);
 
             var dto = new TransportObject(Protocol.MessageType.IM_OK);
-            dto.Add("Friends", friendFlats);
+            //dto.Add("Friends", friendFlats);
+            dto.Add("Conversations", conversationFlats);
             dto.Add("RequestCount", requestCount);
             dto.Add("UserFlat", flat);
 

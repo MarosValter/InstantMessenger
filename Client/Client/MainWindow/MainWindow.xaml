@@ -18,11 +18,15 @@
         </Grid.ColumnDefinitions>
         <StackPanel Margin="0,2,1,2" Grid.Row="1" CanVerticallyScroll="True" ScrollViewer.VerticalScrollBarVisibility="Auto">
             <Expander Header="Online" IsExpanded="True" Foreground="#FF707070">
-                <ListBox x:Name="OnlineFriends" ItemsSource="{Binding Path=OnlineFriends}" DisplayMemberPath="Username" MouseDoubleClick="OnlineFriends_MouseDoubleClick" BorderBrush="{x:Null}" Background="{x:Null}"/>
+                <ListBox x:Name="OnlineFriends" ItemsSource="{Binding Path=OnlineFriends}" DisplayMemberPath="Name" MouseDoubleClick="OnlineFriends_MouseDoubleClick" BorderBrush="{x:Null}" Background="{x:Null}"/>
             </Expander>
             <Separator Foreground="#FFACACAC" Background="#FFACACAC"/>
             <Expander Header="Offline" Foreground="#FF707070">
-                <ListBox x:Name="OfflineFriends" ItemsSource="{Binding Path=OfflineFriends}" DisplayMemberPath="Username" BorderBrush="{x:Null}" Background="{x:Null}"/>
+                <ListBox x:Name="OfflineFriends" ItemsSource="{Binding Path=OfflineFriends}" DisplayMemberPath="Name" BorderBrush="{x:Null}" Background="{x:Null}"/>
+            </Expander>
+            <Separator Foreground="#FFACACAC" Background="#FFACACAC"/>
+            <Expander Header="Group chats" Foreground="#FF707070">
+                <ListBox x:Name="GroupChats" ItemsSource="{Binding Path=GroupChats}" DisplayMemberPath="Name" BorderBrush="{x:Null}" Background="{x:Null}"/>
             </Expander>
         </StackPanel>
         <TabControl x:Name="Conversations" Margin="1,0,0,2" Grid.Column="1" Grid.Row="1" Grid.RowSpan="3" Padding="0"/>

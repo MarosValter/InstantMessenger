@@ -12,7 +12,7 @@
       <Value Profile="(Default)">test</Value>
     </Setting>
     <Setting Name="RelativeCertPath" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">..//..//..//cert</Value>
+      <Value Profile="(Default)">..\..\..\cert</Value>
     </Setting>
   </Settings>
 </SettingsFile>

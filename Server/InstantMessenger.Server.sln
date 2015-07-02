@@ -19,6 +19,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{4C02BC
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InstantMessenger.Common", "InstantMessenger.Common\InstantMessenger.Common.csproj", "{B2113B06-B6FA-4A5C-9306-E347CA1214D0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebServices", "WebServices\WebServices.csproj", "{A9D20D53-67BD-492E-AE86-4542330FE6E5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InstantMessenger.Communication", "InstantMessenger.Communication\InstantMessenger.Communication.csproj", "{808BC8D4-37C1-469D-ACF1-4407AD029AF2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -81,6 +85,26 @@ Global
 		{B2113B06-B6FA-4A5C-9306-E347CA1214D0}.Release|ARM.ActiveCfg = Release|Any CPU
 		{B2113B06-B6FA-4A5C-9306-E347CA1214D0}.Release|x64.ActiveCfg = Release|Any CPU
 		{B2113B06-B6FA-4A5C-9306-E347CA1214D0}.Release|x86.ActiveCfg = Release|Any CPU
+		{A9D20D53-67BD-492E-AE86-4542330FE6E5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A9D20D53-67BD-492E-AE86-4542330FE6E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A9D20D53-67BD-492E-AE86-4542330FE6E5}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{A9D20D53-67BD-492E-AE86-4542330FE6E5}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{A9D20D53-67BD-492E-AE86-4542330FE6E5}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{A9D20D53-67BD-492E-AE86-4542330FE6E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A9D20D53-67BD-492E-AE86-4542330FE6E5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A9D20D53-67BD-492E-AE86-4542330FE6E5}.Release|ARM.ActiveCfg = Release|Any CPU
+		{A9D20D53-67BD-492E-AE86-4542330FE6E5}.Release|x64.ActiveCfg = Release|Any CPU
+		{A9D20D53-67BD-492E-AE86-4542330FE6E5}.Release|x86.ActiveCfg = Release|Any CPU
+		{808BC8D4-37C1-469D-ACF1-4407AD029AF2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{808BC8D4-37C1-469D-ACF1-4407AD029AF2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{808BC8D4-37C1-469D-ACF1-4407AD029AF2}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{808BC8D4-37C1-469D-ACF1-4407AD029AF2}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{808BC8D4-37C1-469D-ACF1-4407AD029AF2}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{808BC8D4-37C1-469D-ACF1-4407AD029AF2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{808BC8D4-37C1-469D-ACF1-4407AD029AF2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{808BC8D4-37C1-469D-ACF1-4407AD029AF2}.Release|ARM.ActiveCfg = Release|Any CPU
+		{808BC8D4-37C1-469D-ACF1-4407AD029AF2}.Release|x64.ActiveCfg = Release|Any CPU
+		{808BC8D4-37C1-469D-ACF1-4407AD029AF2}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

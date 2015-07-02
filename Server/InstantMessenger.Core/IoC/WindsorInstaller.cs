@@ -17,6 +17,7 @@ namespace InstantMessenger.Core.IoC
     public class WindsorInstaller : IWindsorInstaller
     {
         private static readonly Assembly DataModelAssembly = Assembly.Load("InstantMessenger.DataModel");
+        private static readonly Assembly CommunicationAssembly = Assembly.Load("InstantMessenger.Communication");
 
         public void Install(IWindsorContainer container, IConfigurationStore store)
         {

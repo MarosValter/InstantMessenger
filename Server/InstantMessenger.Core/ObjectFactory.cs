@@ -18,6 +18,11 @@ namespace InstantMessenger.Core
             return _container.Resolve<T>();
         }
 
+        public static T GetInstance<T>(T type)
+        {
+            return _container.Resolve<T>();
+        }
+
         public static T[] GetAllInstances<T>()
         {
             return _container.ResolveAll<T>();

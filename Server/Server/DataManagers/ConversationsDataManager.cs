@@ -36,7 +36,7 @@ namespace InstantMessenger.DataModel.DataManagers
 
             if (messages.Any())
             {
-                dto.Type = Protocol.MessageType.IM_OK; 
+                dto.Type = Protocol.MessageType.IM_OK;
                 var flats = Mapper.Map<IList<BDOMessage>, IList<MessageFlat>>(messages);
                 dto.Add("Messages", flats);
             }

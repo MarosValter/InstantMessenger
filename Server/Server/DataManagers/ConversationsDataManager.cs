@@ -5,8 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
 using InstantMessenger.Common;
+using InstantMessenger.Common.DM;
 using InstantMessenger.Common.Flats;
-using InstantMessenger.Common.TransportObject;
+using InstantMessenger.Communication;
 using InstantMessenger.Core;
 using InstantMessenger.Core.Base.Implementation;
 using InstantMessenger.Core.UOW;
@@ -15,9 +16,9 @@ using InstantMessenger.DataModel.BRO;
 
 namespace InstantMessenger.DataModel.DataManagers
 {
-    public class ConversationsDataManager : DataManagerBase
+    public class ConversationsDataManager : IConversationsDataManager
     {
-        public override void RegisterMapping(IConfiguration mapper)
+        public void RegisterMapping(IConfiguration mapper)
         {
             mapper.CreateMap<BDOMessage, MessageFlat>()
                 .ForMember(dest => dest.DateTime, opt => opt.MapFrom(src => src.Created))
@@ -36,13 +37,13 @@ namespace InstantMessenger.DataModel.DataManagers
 
             if (messages.Any())
             {
-                dto.Type = Protocol.MessageType.IM_OK;
+                //dto.Type = Protocol.MessageType.IM_OK;
                 var flats = Mapper.Map<IList<BDOMessage>, IList<MessageFlat>>(messages);
                 dto.Add("Messages", flats);
             }
             else
             {
-                dto.Type = Protocol.MessageType.IM_DONT_SEND;
+                //dto.Type = Protocol.MessageType.IM_DONT_SEND;
             }
 
             return dto;
@@ -57,7 +58,7 @@ namespace InstantMessenger.DataModel.DataManagers
             var messages = ObjectFactory.GetInstance<BROMessages>().GetOldByConversationOid(conversationOid, firstMessageOrder);
             var flats = Mapper.Map<IList<BDOMessage>, IList<MessageFlat>>(messages);
 
-            var dto = new TransportObject(Protocol.MessageType.IM_OK);
+            var dto = new TransportObject(/*Protocol.MessageType.IM_OK*/);
             dto.Add("Messages", flats);
             dto.Add("Old", true);
 
@@ -90,7 +91,7 @@ namespace InstantMessenger.DataModel.DataManagers
 
             ObjectFactory.GetInstance<BROMessages>().Create(bdo);
 
-            var dto = new TransportObject(Protocol.MessageType.IM_DONT_SEND);
+            var dto = new TransportObject(/*Protocol.MessageType.IM_DONT_SEND*/);
             return dto;
         }
     }

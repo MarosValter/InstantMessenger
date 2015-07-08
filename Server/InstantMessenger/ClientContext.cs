@@ -4,7 +4,7 @@ using System.Net.Security;
 using System.Net.Sockets;
 using InstantMessenger.Common;
 using InstantMessenger.Common.Flats;
-using InstantMessenger.Common.TransportObject;
+using InstantMessenger.Common.OldTO;
 using InstantMessenger.Core;
 using InstantMessenger.DataModel.DataManagers;
 
@@ -83,48 +83,48 @@ namespace InstantMessenger.Server
         private void Process(TransportObject to)
         {
             var result = new TransportObject();
-            switch (to.Type)
-            {
-                case Protocol.MessageType.IM_Login:
-                    result = ObjectFactory.GetInstance<UsersDataManager>().LoginUser(to);
-                    if (result.Type == Protocol.MessageType.IM_OK)
-                    {
-                        User = result.Get<UserFlat>("UserFlat");
-                        if (LoggedIn != null)
-                            LoggedIn(this, null);
-                    }
-                    break;
-                case Protocol.MessageType.IM_InitMain:
-                    result = ObjectFactory.GetInstance<UsersDataManager>().MainWindowInit(to);
-                    break;
-                case Protocol.MessageType.IM_InitConversation:
-                    result = ObjectFactory.GetInstance<ConversationsDataManager>().Init(to);
-                    break;
-                case Protocol.MessageType.IM_GetOldMessages:
-                    result = ObjectFactory.GetInstance<ConversationsDataManager>().GetOldMessages(to);
-                    break;
-                case Protocol.MessageType.IM_Send:
-                    result = ObjectFactory.GetInstance<ConversationsDataManager>().SendMessage(to);
-                    break;
-                case Protocol.MessageType.IM_Register:
-                    result = ObjectFactory.GetInstance<UsersDataManager>().Register(to);
-                    break;
-                case Protocol.MessageType.IM_Find:
-                    result = ObjectFactory.GetInstance<UsersDataManager>().FindUsers(to);
-                    break;
-                case Protocol.MessageType.IM_GetRequests:
-                    result = ObjectFactory.GetInstance<FriendshipsDataManager>().GetRequests(to);
-                    break;
-                case Protocol.MessageType.IM_Add:
-                    result = ObjectFactory.GetInstance<FriendshipsDataManager>().SendRequest(to);
-                    break;
-                case Protocol.MessageType.IM_AcceptRequest:
-                    result = ObjectFactory.GetInstance<FriendshipsDataManager>().AcceptRequest(to);
-                    break;
-                case Protocol.MessageType.IM_DeleteRequest:
-                    result = ObjectFactory.GetInstance<FriendshipsDataManager>().DeleteRequest(to);
-                    break;
-            }
+            //switch (to.Type)
+            //{
+            //    case Protocol.MessageType.IM_Login:
+            //        result = ObjectFactory.GetInstance<UsersDataManager>().LoginUser(to);
+            //        if (result.Type == Protocol.MessageType.IM_OK)
+            //        {
+            //            User = result.Get<UserFlat>("UserFlat");
+            //            if (LoggedIn != null)
+            //                LoggedIn(this, null);
+            //        }
+            //        break;
+            //    case Protocol.MessageType.IM_InitMain:
+            //        result = ObjectFactory.GetInstance<UsersDataManager>().MainWindowInit(to);
+            //        break;
+            //    case Protocol.MessageType.IM_InitConversation:
+            //        result = ObjectFactory.GetInstance<ConversationsDataManager>().Init(to);
+            //        break;
+            //    case Protocol.MessageType.IM_GetOldMessages:
+            //        result = ObjectFactory.GetInstance<ConversationsDataManager>().GetOldMessages(to);
+            //        break;
+            //    case Protocol.MessageType.IM_Send:
+            //        result = ObjectFactory.GetInstance<ConversationsDataManager>().SendMessage(to);
+            //        break;
+            //    case Protocol.MessageType.IM_Register:
+            //        result = ObjectFactory.GetInstance<UsersDataManager>().Register(to);
+            //        break;
+            //    case Protocol.MessageType.IM_Find:
+            //        result = ObjectFactory.GetInstance<UsersDataManager>().FindUsers(to);
+            //        break;
+            //    case Protocol.MessageType.IM_GetRequests:
+            //        result = ObjectFactory.GetInstance<FriendshipsDataManager>().GetRequests(to);
+            //        break;
+            //    case Protocol.MessageType.IM_Add:
+            //        result = ObjectFactory.GetInstance<FriendshipsDataManager>().SendRequest(to);
+            //        break;
+            //    case Protocol.MessageType.IM_AcceptRequest:
+            //        result = ObjectFactory.GetInstance<FriendshipsDataManager>().AcceptRequest(to);
+            //        break;
+            //    case Protocol.MessageType.IM_DeleteRequest:
+            //        result = ObjectFactory.GetInstance<FriendshipsDataManager>().DeleteRequest(to);
+            //        break;
+            //}
 
             var modelGuid = to.Get<Guid>("ModelGuid");
             result.Add("ModelGuid", modelGuid);

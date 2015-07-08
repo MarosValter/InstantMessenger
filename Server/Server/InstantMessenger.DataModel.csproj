@@ -82,6 +82,10 @@
       <Project>{b2113b06-b6fa-4a5c-9306-e347ca1214d0}</Project>
       <Name>InstantMessenger.Common</Name>
     </ProjectReference>
+    <ProjectReference Include="..\InstantMessenger.Communication\InstantMessenger.Communication.csproj">
+      <Project>{808BC8D4-37C1-469D-ACF1-4407AD029AF2}</Project>
+      <Name>InstantMessenger.Communication</Name>
+    </ProjectReference>
     <ProjectReference Include="..\InstantMessenger.Core\InstantMessenger.Core.csproj">
       <Project>{250e222a-effd-4f1e-a57a-e3bdf5278c17}</Project>
       <Name>InstantMessenger.Core</Name>

@@ -15,21 +15,16 @@ namespace InstantMessenger.Communication
         {
             InitTO(to);
             var response = CallMainService(dataManagerType, method, to);
-            ProcessReturnedTO(response);
+            ProcessReturnedTO(response, to);
         }
 
         private void InitTO(TransportObject to)
         {
-            throw new NotImplementedException();
         }
 
         private TransportObject CallMainService(Type dataManagerType, MethodInfo method, TransportObject to)
         {
-            var host = new ServiceHost(typeof (IMainService));
-            host.Description.Endpoints
-            ServiceEndpoint endpoint = default(ServiceEndpoint);
-
-            using (var factory = new ChannelFactory<IMainService>(endpoint))
+            using (var factory = new ChannelFactory<IMainService>())
             {
                 var proxy = factory.CreateChannel();
 
@@ -49,9 +44,9 @@ namespace InstantMessenger.Communication
             }
         }
 
-        private void ProcessReturnedTO(TransportObject to)
+        private void ProcessReturnedTO(TransportObject response, TransportObject to)
         {
-            
+            to.AddFromDict(response.Items);
         }
     }
 }

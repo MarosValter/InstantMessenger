@@ -10,7 +10,7 @@ namespace InstantMessenger.Core
         public static void Init()
         {
             _container = new WindsorContainer();
-            _container.Install(FromAssembly.This());
+            _container.Install(FromAssembly.InThisApplication());
         }
 
         public static T GetInstance<T>()

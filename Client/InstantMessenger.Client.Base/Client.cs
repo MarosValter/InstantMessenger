@@ -10,7 +10,7 @@ using System.Threading;
 using System.Windows;
 using InstantMessenger.Common;
 using InstantMessenger.Common.Flats;
-using InstantMessenger.Common.TransportObject;
+using InstantMessenger.Common.OldTO;
 
 namespace InstantMessenger.Client.Base
 {
@@ -51,7 +51,7 @@ namespace InstantMessenger.Client.Base
         private static int _port;
         private static SslStream _stream;
 
-        private static readonly ConcurrentDictionary<Guid, ModelBase> ModelDictionary; 
+        private static readonly ConcurrentDictionary<Guid, ModelBase<IDataManager>> ModelDictionary; 
 
         private static readonly BackgroundWorker SendWorker;
         private static ConcurrentQueue<TransportObject> _sendCache;
@@ -76,7 +76,7 @@ namespace InstantMessenger.Client.Base
             _connectionState = State.Disconnected;
             _client = new TcpClient();
 
-            ModelDictionary = new ConcurrentDictionary<Guid, ModelBase>();
+            ModelDictionary = new ConcurrentDictionary<Guid, ModelBase<IDataManager>>();
 
             ConnectWorker = new BackgroundWorker();
             ConnectWorker.DoWork += ConnectWorkerOnDoWork;
@@ -210,11 +210,11 @@ namespace InstantMessenger.Client.Base
 
                     if (Application.Current.Dispatcher.CheckAccess())
                     {
-                        model.GetResponse(to);
+                        //model.GetResponse(to);
                     }
                     else
                     {
-                        Application.Current.Dispatcher.BeginInvoke(new Action(() => model.GetResponse(to)));
+                        //Application.Current.Dispatcher.BeginInvoke(new Action(() => model.GetResponse(to)));
                     }
                 }
             }
@@ -276,7 +276,7 @@ namespace InstantMessenger.Client.Base
             }
         }      
 
-        internal static void SendRequest(TransportObject to, ModelBase model)
+        internal static void SendRequest(TransportObject to, ModelBase<IDataManager> model)
         {
             var modelGuid = to.Get<Guid>("ModelGuid");
             if (!ModelDictionary.ContainsKey(modelGuid))

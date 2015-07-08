@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using InstantMessenger.Common;
-using InstantMessenger.Common.TransportObject;
+using InstantMessenger.Communication;
 
 namespace InstantMessenger.Client.Base
 {
@@ -17,7 +13,7 @@ namespace InstantMessenger.Client.Base
         //private bool _disposed ;
         private LoadingScreen _loadingScreen;
 
-        public ModelBase Model { get; set; }
+        public ModelBase<IDataManager> Model { get; set; }
 
         public ICommand OKCommand { get; private set; }
         public ICommand CancelCommand { get; private set; }
@@ -60,7 +56,7 @@ namespace InstantMessenger.Client.Base
 
         #endregion
 
-        protected void Init(ModelBase model)
+        protected void Init(ModelBase<IDataManager> model)
         {
             Model = model;
             DataContext = model;

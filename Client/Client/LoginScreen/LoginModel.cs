@@ -1,11 +1,13 @@
 ﻿using System.Security;
 using InstantMessenger.Client.Base;
 using InstantMessenger.Common;
-using InstantMessenger.Common.TransportObject;
+using InstantMessenger.Common.DM;
+using InstantMessenger.Communication;
+using TransportObject = InstantMessenger.Communication.TransportObject;
 
 namespace InstantMessenger.Client.LoginScreen
 {
-    public class LoginModel : ModelBase
+    public class LoginModel : ModelBase<IUsersDataManager>
     {
         #region Attributes
 
@@ -28,6 +30,7 @@ namespace InstantMessenger.Client.LoginScreen
 
         public LoginModel()
         {
+            InitMethod = i => i.LoginUser;
             Username = Properties.Settings.Default.Username;
         }
 
@@ -39,7 +42,7 @@ namespace InstantMessenger.Client.LoginScreen
         {
             var pwd = Helper.HashPassword(Password);
 
-            to.Type = Protocol.MessageType.IM_Login;
+            //to.Type = Protocol.MessageType.IM_Login;
             to.Add("Username", Username);
             to.Add("Password", pwd);
 

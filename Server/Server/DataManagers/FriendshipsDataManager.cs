@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using AutoMapper;
 using InstantMessenger.Common;
+using InstantMessenger.Common.DM;
 using InstantMessenger.Common.Flats;
-using InstantMessenger.Common.TransportObject;
+using InstantMessenger.Communication;
 using InstantMessenger.Core;
 using InstantMessenger.Core.Base.Implementation;
 using InstantMessenger.Core.UOW;
@@ -12,9 +14,9 @@ using InstantMessenger.DataModel.BRO;
 
 namespace InstantMessenger.DataModel.DataManagers
 {
-    public class FriendshipsDataManager : DataManagerBase
+    public class FriendshipsDataManager : IFriendshipsDataManager
     {
-        public override void RegisterMapping(AutoMapper.IConfiguration mapper)
+        public void RegisterMapping(AutoMapper.IConfiguration mapper)
         {
             mapper.CreateMap<BDOFriendship, RequestFlat>()
                   .ForMember(dest => dest.UserOID, opt => opt.MapFrom(src => src.User.OID))
@@ -29,7 +31,7 @@ namespace InstantMessenger.DataModel.DataManagers
             var requests = ObjectFactory.GetInstance<BROFriendship>().GetUserRequests(myOid);
             var requestFlats = AutoMapper.Mapper.Map<IList<BDOFriendship>, IList<RequestFlat>>(requests);
 
-            var dto = new TransportObject(Protocol.MessageType.IM_OK);
+            var dto = new TransportObject(/*Protocol.MessageType.IM_OK*/);
             dto.Add("Requests", requestFlats);
 
             return dto;
@@ -47,7 +49,7 @@ namespace InstantMessenger.DataModel.DataManagers
 
             if (recipient == null)
             {
-                dto.Type = Protocol.MessageType.IM_ERROR;
+                //dto.Type = Protocol.MessageType.IM_ERROR;
                 dto.Add("Error", "User doesn't exist.");
                 return dto;
             }
@@ -58,7 +60,7 @@ namespace InstantMessenger.DataModel.DataManagers
                                    ? "Already friends."
                                    : "User already asked for friendship.";
                 dto.Add("Error", errorMsg);
-                dto.Type = Protocol.MessageType.IM_ERROR;
+                //dto.Type = Protocol.MessageType.IM_ERROR;
                 
                 return dto;
             }
@@ -66,7 +68,7 @@ namespace InstantMessenger.DataModel.DataManagers
             var bdo = new BDOFriendship {User = sender, Friend = recipient, IsAccepted = false};
             ObjectFactory.GetInstance<BROFriendship>().Create(bdo);
 
-            dto.Type = Protocol.MessageType.IM_OK;
+            //dto.Type = Protocol.MessageType.IM_OK;
             return dto;
         }
 
@@ -83,7 +85,7 @@ namespace InstantMessenger.DataModel.DataManagers
 
             if (ObjectFactory.GetInstance<BROFriendship>().AlreadyAccepted(sender, recipient))
             {
-                dto.Type = Protocol.MessageType.IM_ERROR;
+                //dto.Type = Protocol.MessageType.IM_ERROR;
                 dto.Add("Error", "Request already accepted.");
                 return dto;
             }
@@ -95,14 +97,14 @@ namespace InstantMessenger.DataModel.DataManagers
 
             if (accepted && dialogCreated)
             {
-                dto.Type = Protocol.MessageType.IM_OK;
+                //dto.Type = Protocol.MessageType.IM_OK;
             }
             else
             {
                 var msg = accepted
                     ? "Unable to create conversation after accepting "
                     : "Unable to accept request.";
-                dto.Type = Protocol.MessageType.IM_ERROR;
+                //dto.Type = Protocol.MessageType.IM_ERROR;
                 dto.Add("Error", msg);
                 return dto;
             }
@@ -113,6 +115,19 @@ namespace InstantMessenger.DataModel.DataManagers
         public TransportObject DeleteRequest(TransportObject to)
         {
             throw new NotImplementedException();
+        }
+
+        [UnitOfWork]
+        public virtual TransportObject FindUsers(TransportObject to)
+        {
+            var username = to.Get<string>("Username");
+            var users = ObjectFactory.GetInstance<BROUsers>().GetUsersStartingNameWith(username);
+            var flats = Mapper.Map<IList<BDOUser>, IList<UserFlat>>(users);
+
+            var dto = new TransportObject(/*Protocol.MessageType.IM_OK*/);
+            dto.Add("Users", flats);
+
+            return dto;
         }
     }
 }

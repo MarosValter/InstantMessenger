@@ -1,5 +1,5 @@
 ﻿using System;
-using InstantMessenger.Common.TransportObject;
+using InstantMessenger.Common.OldTO;
 using ProtoBuf;
 
 namespace InstantMessenger.Common.Flats

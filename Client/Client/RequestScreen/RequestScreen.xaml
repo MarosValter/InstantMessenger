@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:p="clr-namespace:InstantMessenger.Client.Properties"
         xmlns:base="clr-namespace:InstantMessenger.Client.Base;assembly=InstantMessenger.Client.Base"
+        xmlns:dm="clr-namespace:InstantMessenger.Common.DM;assembly=InstantMessenger.Common"
         x:Class="InstantMessenger.Client.RequestScreen.RequestScreen"
         Title="Friend requests" Height="300" Width="400" ResizeMode="NoResize">
     <Grid>
@@ -21,20 +22,20 @@
                 <DataGridTemplateColumn CanUserResize="False" Width="64">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Button Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type base:WindowBase}}, Path=OKCommand}" Content="{x:Static p:Resources.Accept}" Name="_btnAccept" Background="White" Height="20" Width="60" FontSize="12" FontWeight="Medium"/>
+                            <Button Command="{Binding Path=OKCommand}" Content="{x:Static p:Resources.Accept}" Name="_btnAccept" Background="White" Height="20" Width="60" FontSize="12" FontWeight="Medium"/>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
                 <DataGridTemplateColumn CanUserResize="False" Width="64">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Button Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type base:WindowBase}}, Path=RequestCommand}" Content="{x:Static p:Resources.Delete}" CommandParameter="{Binding Path=DeleteRequestAction}" Background="White" Height="20" Width="60" FontSize="12" FontWeight="Medium"/>
+                            <Button Command="{Binding Path=RequestCommand}" Content="{x:Static p:Resources.Delete}" CommandParameter="{Binding Path=DeleteRequestAction}" Background="White" Height="20" Width="60" FontSize="12" FontWeight="Medium"/>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
             </DataGrid.Columns>
         </DataGrid>
-        <Button x:Name="_btnClose" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type base:WindowBase}}, Path=CancelCommand}" Content="{x:Static p:Resources.Close}" Margin="0,0,5,5" Height="20" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="75" IsCancel="True" TabIndex="4" Background="White"/>
+        <Button x:Name="_btnClose" Command="{Binding Path=CancelCommand}" Content="{x:Static p:Resources.Close}" Margin="0,0,5,5" Height="20" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="75" IsCancel="True" TabIndex="4" Background="White"/>
 
     </Grid>
 </base:WindowBase>

@@ -1,6 +1,6 @@
 ﻿using ProtoBuf;
 
-namespace InstantMessenger.Common.TransportObject
+namespace InstantMessenger.Common.OldTO
 {
     [ProtoContract]
     public class SerializableBase

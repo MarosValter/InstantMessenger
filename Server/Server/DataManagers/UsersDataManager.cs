@@ -3,19 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
 using InstantMessenger.Common;
+using InstantMessenger.Common.DM;
 using InstantMessenger.Common.Flats;
-using InstantMessenger.Common.TransportObject;
+using InstantMessenger.Communication;
 using InstantMessenger.Core;
-using InstantMessenger.Core.Base.Implementation;
 using InstantMessenger.Core.UOW;
 using InstantMessenger.DataModel.BDO;
 using InstantMessenger.DataModel.BRO;
 
 namespace InstantMessenger.DataModel.DataManagers
 {
-    public class UsersDataManager : DataManagerBase
+    public class UsersDataManager :  IUsersDataManager
     {
-        public override void RegisterMapping(IConfiguration mapper)
+        public void RegisterMapping(IConfiguration mapper)
         {
             mapper.CreateMap<BDOUser, UserFlat>();
             mapper.CreateMap<BDOFriendship, UserFlat>()
@@ -48,21 +48,21 @@ namespace InstantMessenger.DataModel.DataManagers
 
             if (user == null)
             {
-                dto.Type = Protocol.MessageType.IM_ERROR;
+                //dto.Type = Protocol.MessageType.IM_ERROR;
                 dto.Add("Error", "User doesn't exist!");
                 return dto;
             }
 
             if (user.IsOnline)
             {
-                dto.Type = Protocol.MessageType.IM_ERROR;
+                //dto.Type = Protocol.MessageType.IM_ERROR;
                 dto.Add("Error", "User is already online.");
                 return dto;
             }
 
             if (!user.PasswordHash.SequenceEqual(pwdHash))
             {
-                dto.Type = Protocol.MessageType.IM_ERROR;
+                //dto.Type = Protocol.MessageType.IM_ERROR;
                 dto.Add("Error", "Wrong password!");
                 return dto;
             }
@@ -72,7 +72,7 @@ namespace InstantMessenger.DataModel.DataManagers
             ObjectFactory.GetInstance<BROUsers>().Update(user);
             var flat = Mapper.Map<BDOUser, UserFlat>(user);
 
-            dto.Type = Protocol.MessageType.IM_OK;
+            //dto.Type = Protocol.MessageType.IM_OK;
             dto.Add("UserFlat", flat);
 
             return dto;
@@ -98,7 +98,7 @@ namespace InstantMessenger.DataModel.DataManagers
 
             if (user != null)
             {
-                dto.Type = Protocol.MessageType.IM_ERROR;
+                //dto.Type = Protocol.MessageType.IM_ERROR;
                 dto.Add("Error", "User already exists!");
                 return dto;
             }
@@ -111,7 +111,7 @@ namespace InstantMessenger.DataModel.DataManagers
             };
 
             ObjectFactory.GetInstance<BROUsers>().Create(user);
-            dto.Type = Protocol.MessageType.IM_OK;
+            //dto.Type = Protocol.MessageType.IM_OK;
 
             return dto;
         }
@@ -141,7 +141,7 @@ namespace InstantMessenger.DataModel.DataManagers
             //var friendFlats = Mapper.Map<IList<BDOFriendship>, IList<UserFlat>>(friends);
             var flat = Mapper.Map<BDOUser, UserFlat>(user);
 
-            var dto = new TransportObject(Protocol.MessageType.IM_OK);
+            var dto = new TransportObject(/*Protocol.MessageType.IM_OK*/);
             //dto.Add("Friends", friendFlats);
             dto.Add("Conversations", conversationFlats);
             dto.Add("RequestCount", requestCount);
@@ -157,7 +157,7 @@ namespace InstantMessenger.DataModel.DataManagers
             var users = ObjectFactory.GetInstance<BROUsers>().GetUsersStartingNameWith(username);
             var flats = Mapper.Map<IList<BDOUser>, IList<UserFlat>>(users);
 
-            var dto = new TransportObject(Protocol.MessageType.IM_OK);
+            var dto = new TransportObject(/*Protocol.MessageType.IM_OK*/);
             dto.Add("Users", flats);
 
             return dto;

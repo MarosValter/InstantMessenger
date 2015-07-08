@@ -80,6 +80,10 @@
       <Project>{b2113b06-b6fa-4a5c-9306-e347ca1214d0}</Project>
       <Name>InstantMessenger.Common</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Server\InstantMessenger.Communication\InstantMessenger.Communication.csproj">
+      <Project>{808bc8d4-37c1-469d-acf1-4407ad029af2}</Project>
+      <Name>InstantMessenger.Communication</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Page Include="CircularProgressBar.xaml">

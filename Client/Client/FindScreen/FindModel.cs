@@ -6,12 +6,13 @@ using System.Text;
 using System.Threading.Tasks;
 using InstantMessenger.Client.Base;
 using InstantMessenger.Common;
+using InstantMessenger.Common.DM;
 using InstantMessenger.Common.Flats;
-using InstantMessenger.Common.TransportObject;
+using InstantMessenger.Communication;
 
 namespace InstantMessenger.Client.FindScreen
 {
-    public class FindModel : ModelBase
+    public class FindModel : ModelBase<IFriendshipsDataManager>
     {
         #region Attributes
 
@@ -42,13 +43,13 @@ namespace InstantMessenger.Client.FindScreen
 
         public void FindUser(TransportObject to)
         {
-            to.Type = Protocol.MessageType.IM_Find;
+            //to.Type = Protocol.MessageType.IM_Find;
             to.Add("Username", Username);
         }
 
         protected override void CreateRequest(TransportObject to)
         {
-            to.Type = Protocol.MessageType.IM_Add;
+            //to.Type = Protocol.MessageType.IM_Add;
             to.Add("UserOid", SelectedUserOid);
         }
 

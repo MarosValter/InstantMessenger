@@ -5,7 +5,7 @@ using System.Net.Security;
 using InstantMessenger.Common.Flats;
 using ProtoBuf;
 
-namespace InstantMessenger.Common.TransportObject
+namespace InstantMessenger.Common.OldTO
 {
     [ProtoContract]
     public class TransportObject

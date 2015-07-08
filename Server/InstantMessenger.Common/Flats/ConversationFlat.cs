@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using InstantMessenger.Common.TransportObject;
+using InstantMessenger.Common.OldTO;
 using ProtoBuf;
 
 namespace InstantMessenger.Common.Flats

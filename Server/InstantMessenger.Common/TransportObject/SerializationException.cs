@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace InstantMessenger.Common.TransportObject
+namespace InstantMessenger.Common.OldTO
 {
     public class SerializationException : Exception
     {

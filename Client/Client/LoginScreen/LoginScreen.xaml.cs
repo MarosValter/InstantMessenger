@@ -1,7 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 using InstantMessenger.Client.Base;
-using InstantMessenger.Common.TransportObject;
+using InstantMessenger.Communication;
 
 namespace InstantMessenger.Client.LoginScreen
 {

@@ -2,13 +2,12 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:p="clr-namespace:InstantMessenger.Client.Properties"
-        xmlns:Common="clr-namespace:InstantMessenger.Common;assembly=InstantMessenger.Common"
         xmlns:base="clr-namespace:InstantMessenger.Client.Base;assembly=InstantMessenger.Client.Base"
         x:Class="InstantMessenger.Client.FindScreen.FindScreen"
         Title="FindScreen" Height="300" Width="400" ResizeMode="NoResize">
     <Grid>
         <TextBox x:Name="_txtFind" Text="{Binding Path=Username}" Height="20" Margin="5,5,80,0" TextWrapping="Wrap" VerticalAlignment="Top" TabIndex="0"/>
-        <Button x:Name="_btnFind" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type base:WindowBase}}, Path=RequestCommand}" CommandParameter="{Binding Path=FindUserAction}" Content="{x:Static p:Resources.Find}" Margin="0,5,5,0" VerticalAlignment="Top" Height="20" HorizontalAlignment="Right" Width="70" Background="White" TabIndex="1" IsDefault="True"/>
+        <Button x:Name="_btnFind" Command="{Binding  Path=RequestCommand}" CommandParameter="{Binding Path=FindUserAction}" Content="{x:Static p:Resources.Find}" Margin="0,5,5,0" VerticalAlignment="Top" Height="20" HorizontalAlignment="Right" Width="70" Background="White" TabIndex="1" IsDefault="True"/>
         <DataGrid x:Name="_grid" Margin="5,30" SelectedValue="{Binding Path=SelectedUserOid}" ItemsSource="{Binding Path=Users}" TabIndex="2" IsTextSearchEnabled="True" Background="White" AutoGenerateColumns="False" SelectedValuePath="OID" CanUserReorderColumns="False" SelectionMode="Single" CanUserAddRows="False" ScrollViewer.CanContentScroll="False" HorizontalGridLinesBrush="Gray" VerticalGridLinesBrush="Gray">
             <DataGrid.Columns>
                 <DataGridTextColumn CanUserResize="False" Width="*" Header="Username" Binding="{Binding Username}" IsReadOnly="True" Foreground="#FF474747"/>

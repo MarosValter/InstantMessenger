@@ -16,7 +16,7 @@ namespace InstantMessenger.Communication
         public static void Process<TDataManager>(this TransportObject to, Expression<Func<TDataManager, Func<TransportObject, TransportObject>>> method)
         {
             var processor = ObjectFactory.GetInstance<ITransportObjectProcessor>();
-            processor.Process(typeof(TDataManager), ServiceMethodHelper<IMainService>.GetMethodInfo(method), to);
+            processor.Process(typeof(TDataManager), ServiceMethodHelper<TDataManager>.GetMethodInfo(method), to);
         }     
     }
 }

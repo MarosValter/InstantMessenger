@@ -1,4 +1,5 @@
 ﻿using InstantMessenger.Client.Base;
+using InstantMessenger.Common.DM;
 
 namespace InstantMessenger.Client.FindScreen
 {

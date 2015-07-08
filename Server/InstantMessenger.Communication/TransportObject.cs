@@ -10,6 +10,11 @@ namespace InstantMessenger.Communication
         [DataMember]
         private Dictionary<string, object> _items = new Dictionary<string, object>();
 
+        public Dictionary<string, object> Items
+        {
+            get { return _items; }
+        }
+
         private readonly object _addLocker = new object();
 
         public bool ContainsKey(string key)
@@ -35,6 +40,15 @@ namespace InstantMessenger.Communication
             lock (_addLocker)
             {
                 _items.Add(key, value);
+            }
+        }
+
+        public void AddFromDict(Dictionary<string, object> dict)
+        {
+            _items.Clear();
+            foreach (var item in dict)
+            {
+                Add(item.Key, item.Value);
             }
         }
     }

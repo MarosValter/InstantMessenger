@@ -1,13 +1,16 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 using InstantMessenger.Client.Base.Properties;
 using InstantMessenger.Common;
-using InstantMessenger.Common.TransportObject;
+using InstantMessenger.Communication;
+using TransportObject = InstantMessenger.Communication.TransportObject;
 
 namespace InstantMessenger.Client.Base
 {
-    public abstract class ModelBase : INotifyPropertyChanged
+    public abstract class ModelBase<TDataManager> : INotifyPropertyChanged
+        where TDataManager : IDataManager
     {
         public event EventHandler<TransportObject> BeforeProcessResponse;
         internal event EventHandler<string> ErrorReceived;
@@ -15,6 +18,10 @@ namespace InstantMessenger.Client.Base
 
         public bool Success;
         private readonly Guid _modelGuid;
+
+        protected Expression<Func<TDataManager, Func<TransportObject, TransportObject>>> InitMethod;
+        protected Expression<Func<TDataManager, Func<TransportObject, TransportObject>>> MainMethod;
+        protected Expression<Func<TDataManager, Func<TransportObject, TransportObject>>> CustomMethod;
         
         protected ModelBase()
         {
@@ -33,27 +40,31 @@ namespace InstantMessenger.Client.Base
         {
             var to = new TransportObject();
             CreateRequest(to);
-            SendRequest(to);
+            SendRequest(to, MainMethod);
         }
 
         internal virtual void CustomRequest(Action<TransportObject> action)
         {
             var to = new TransportObject();
             action(to);
-            SendRequest(to);
+            SendRequest(to, CustomMethod);
         }
 
         public void GetInitData()
         {
             var to = new TransportObject();
             CreateInitRequest(to);
-            SendRequest(to);
+            SendRequest(to, InitMethod);
         }
 
-        private void SendRequest(TransportObject to)
+        private void SendRequest(TransportObject to, Expression<Func<TDataManager, Func<TransportObject, TransportObject>>> method)
         {
             to.Add("ModelGuid", _modelGuid);
-            Client.SendRequest(to, this);
+
+            to.Process(method);
+            GetResponse(to);
+
+            //Client.SendRequest(to, this);
         }
 
         protected abstract void CreateRequest(TransportObject to);
@@ -65,23 +76,23 @@ namespace InstantMessenger.Client.Base
 
         internal void GetResponse(TransportObject to)
         {
-            if (to.Type == Protocol.MessageType.IM_OK)
-            {
-                Success = true;
-                if (BeforeProcessResponse != null)
-                    BeforeProcessResponse(this, to); 
-                ProcessResponse(to);
-            }
-            else
-            {
-                Success = false;
-                var error = to.Get<string>("Error");
-                if (ErrorReceived != null)
-                    ErrorReceived(this, error);
-            }
+            //if (to.Type == Protocol.MessageType.IM_OK)
+            //{
+            //    Success = true;
+            //    if (BeforeProcessResponse != null)
+            //        BeforeProcessResponse(this, to); 
+            //    ProcessResponse(to);
+            //}
+            //else
+            //{
+            //    Success = false;
+            //    var error = to.Get<string>("Error");
+            //    if (ErrorReceived != null)
+            //        ErrorReceived(this, error);
+            //}
 
-            if (AfterDataReceived != null)
-                AfterDataReceived(this, to);
+            //if (AfterDataReceived != null)
+            //    AfterDataReceived(this, to);
         }
 
         protected virtual void ProcessResponse(TransportObject to)

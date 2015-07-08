@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using InstantMessenger.Client.Base;
 using InstantMessenger.Common;
+using InstantMessenger.Common.DM;
 using InstantMessenger.Common.Flats;
-using InstantMessenger.Common.TransportObject;
+using InstantMessenger.Communication;
 
 namespace InstantMessenger.Client.RequestScreen
 {
-    public class RequestModel : ModelBase
+    public class RequestModel : ModelBase<IFriendshipsDataManager>
     {
         #region Attributes
 
@@ -33,6 +34,9 @@ namespace InstantMessenger.Client.RequestScreen
 
         public RequestModel()
         {
+            InitMethod = i => i.GetRequests;
+            MainMethod = i => i.AcceptRequest;
+            CustomMethod = i => i.DeleteRequest;
             GetInitData();
         }
 
@@ -40,17 +44,17 @@ namespace InstantMessenger.Client.RequestScreen
 
         protected override void CreateInitRequest(TransportObject to)
         {
-            to.Type = Protocol.MessageType.IM_GetRequests;
+            //to.Type = Protocol.MessageType.IM_GetRequests;
         }
         protected override void CreateRequest(TransportObject to)
         {
-            to.Type = Protocol.MessageType.IM_AcceptRequest;
+            //to.Type = Protocol.MessageType.IM_AcceptRequest;
             to.Add("UserOid", SelectedUserOid);
         }
 
         public void DeleteRequest(TransportObject to)
         {
-            to.Type = Protocol.MessageType.IM_DeleteRequest;
+            //to.Type = Protocol.MessageType.IM_DeleteRequest;
             to.Add("UserOid", SelectedUserOid);
         }
 
